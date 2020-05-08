@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct registroHeader {
     char status;
@@ -25,6 +26,8 @@ typedef struct registro {
 
 void printOptions();
 
+void Funcionalidade2(char* nomeArquivo);
+
 int main() {
 
     FILE *fp = fopen("out.bin", "wb"); //wb para escrever em binario
@@ -36,6 +39,9 @@ int main() {
 
         if (operation == 1) {
         } else if (operation == 2) {
+            char nomeArquivo[100];
+            scanf("%s", nomeArquivo);
+            Funcionalidade2(nomeArquivo);
         } else if (operation == 3) {
             break;
         } else {
@@ -79,9 +85,9 @@ void Funcionalidade2(char* nomeArquivo){
         fread(&reg.estadoBebe, 2*sizeof(char), 1, arquivoBinario);
         if(reg.sexoBebe==0)
             printf("Nasceu em %s/%s, em %s, um bebe de sexo IGNORADO.\n", reg.cidadeBebe, reg.estadoBebe, reg.dataNascimento);
-        else if(registro.sexoBebe==1)
+        else if(reg.sexoBebe==1)
             printf("Nasceu em %s/%s, em %s, um bebe de sexo MASCULINO.\n", reg.cidadeBebe, reg.estadoBebe, reg.dataNascimento);
-        else if(registro.sexoBebe==2)
+        else if(reg.sexoBebe==2)
             printf("Nasceu em %s/%s, em %s, um bebe de sexo FEMININO.\n", reg.cidadeBebe, reg.estadoBebe, reg.dataNascimento);
         free(reg.cidadeBebe);
     }
