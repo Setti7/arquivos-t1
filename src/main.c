@@ -12,7 +12,7 @@
 #include "binarioNaTela.h"
 #include <string.h>
 
-void firstOperation();
+void firstOperation(char* arquivoEntrada, char* arquivoSaida);
 
 void printOptions();
 
@@ -28,7 +28,9 @@ int main() {
         scanf("%d", &operation);
 
         if (operation == 1) {
-            firstOperation();
+            char arquivoEntrada[100], arquivoSaida[100];
+            scanf("%s %s", arquivoEntrada, arquivoSaida);
+            firstOperation(arquivoEntrada, arquivoSaida);
         } else if (operation == 2) {
             char nomeArquivo[100];
             scanf("%s", nomeArquivo);
@@ -46,9 +48,9 @@ int main() {
     return 0;
 }
 
-void firstOperation() {
-    FILE *fp = fopen("in.csv", "r");
-    FILE *out = fopen("out.bin", "wb");
+void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
+    FILE *fp = fopen(arquivoEntrada, "r");
+    FILE *out = fopen(arquivoSaida, "wb");
 
     char line[1024];
     int c = 0;
@@ -56,6 +58,7 @@ void firstOperation() {
 
     Registro *r = initRegister();
     RegistroHeader *rh = initRegisterHeader();
+
 
     while (fgets(line, 1024, fp)) {
         if (c == 0) {
@@ -65,29 +68,77 @@ void firstOperation() {
 
         char *tmp = strdup(line);
 
-        char cidadeMae[128] = {0};
-        char cidadeBebe[128] = {0};
         char idNascimento[4] = {0};
         char idadeMae[4] = {0};
-        char dataNascimento[11] = {0};
-        char sexoBebe[4] = {0};
-        char estadoMae[3] = {0};
-        char estadoBebe[3] = {0};
+        r->cidadeBebe = (char*) malloc (128*sizeof(char));
+        r->cidadeMae = (char*) malloc (128*sizeof(char));
 
-        sscanf(tmp, "%128[^,],%128[^,],%4[^,],%4[^,],%11[^,],%4[^,],%3[^,],%3[^\n]", cidadeMae, cidadeBebe,
-               idNascimento,
-               idadeMae, dataNascimento, sexoBebe, estadoMae, estadoBebe);
+        int i = 0;
+        int j = 0;
 
-        r->cidadeMae = cidadeMae;
-        r->cidadeMae_size = strlen(cidadeMae);
-        r->cidadeBebe_size = strlen(cidadeBebe);
-        r->cidadeBebe = cidadeBebe;
-        r->idNascimento = strtol(idNascimento, NULL, 10);;
-        r->idadeMae = strtol(idadeMae, NULL, 10);;
-        strcpy(r->dataNascimento, dataNascimento);
-        r->sexoBebe = strtol(sexoBebe, NULL, 10);
-        strcpy(r->estadoMae, estadoMae);
-        strcpy(r->estadoBebe, estadoBebe);
+        //sscanf(tmp, "%128[^,],%128[^,],%d[^,],%d[^,],%10[^,],%d[^,],%2[^,],%2[^\n]", r->cidadeMae, r->cidadeBebe, &r->idNascimento, &r->idadeMae, r->dataNascimento, &r->sexoBebe, r->estadoMae, r->estadoBebe);
+
+        for(;;i++) {
+            if(tmp[i]==','){
+                i++;
+                break;
+            }
+            r->cidadeMae[i] = tmp[i];
+        } r->cidadeMae[i] = '\0';
+        r->cidadeMae_size = strlen(r->cidadeMae);
+
+        for(;;i++,j++) {
+                if(tmp[i]==','){
+                    i++; j++;
+                    break;
+                }
+            r->cidadeBebe[j] = tmp[i];
+        } r->cidadeBebe[j] = '\0';
+        r->cidadeBebe_size = strlen(r->cidadeBebe);
+        for(j=0;;j++,i++) {
+            if(tmp[i]==','){
+                i++;
+                break;
+            }
+            idNascimento[j] = tmp[i];
+        }
+        r->idNascimento = atoi(idNascimento);
+        for(j=0;;j++,i++) {
+            if(tmp[i]==','){
+                i++;
+                break;
+            }
+            idadeMae[j] = tmp[i];
+        }
+        r->idadeMae = atoi(idadeMae);
+        for(j=0;;j++,i++) {
+            if(tmp[i]==','){
+                i++; j++;
+                break;
+            }
+            r->dataNascimento[j]=tmp[i];
+        } r->dataNascimento[j]='\0';
+        char aux = tmp[i++];
+        if(aux!=','){
+            r->sexoBebe = aux - '0';
+        } else
+            r->sexoBebe = 0;
+
+        for(j=0;;j++,i++) {
+            if(tmp[i]==','){
+                i++; j++;
+                break;
+            }
+            r->estadoMae[j]=tmp[i];
+        } r->estadoMae[j]='\0';
+        for(j=0;;j++,i++) {
+            if(tmp[i]==','){
+                i++; j++;
+                break;
+            }
+            r->estadoBebe[j]=tmp[i];
+        } r->estadoBebe[j]='\0';
+
 
         printRegister(r);
         puts(tmp);
@@ -96,6 +147,7 @@ void firstOperation() {
         addRegister(out, r, rh);
 
         free(tmp);
+
         c++;
     }
 
