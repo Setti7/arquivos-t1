@@ -112,6 +112,12 @@ Registro *readRegister(FILE *fp, int RRN) {
     fread(&r->estadoMae, sizeof(char), 2, fp);
     fread(&r->estadoBebe, sizeof(char), 2, fp);
 
+    char debug;
+    fread(&debug, sizeof(char), 1, fp);
+    fprintf(stderr, "sexoBebe: %d ", debug == '1');
+
+    printRegister(r);
+
     return r;
 }
 
@@ -130,9 +136,9 @@ RegistroHeader *readRegisterHeader(FILE *fp) {
 }
 
 void printRegister(Registro *r) {
-    printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
-           r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
-           r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
+    fprintf(stderr, "Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
+            r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
+            r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
 }
 
 void freeRegister(Registro **r) {

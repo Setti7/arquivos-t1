@@ -12,7 +12,7 @@
 #include "binarioNaTela.h"
 #include <string.h>
 
-void firstOperation(char* arquivoEntrada, char* arquivoSaida);
+void firstOperation(char *arquivoEntrada, char *arquivoSaida);
 
 void printOptions();
 
@@ -23,23 +23,16 @@ int main() {
     FILE *fp = fopen("out.bin", "wb"); //wb para escrever em binario
     int operation = 0;
 
-    while (1) {
-        //printOptions(); //lembrar de comentar antes de enviar
-        scanf("%d", &operation);
+    scanf("%d", &operation);
 
-        if (operation == 1) {
-            char arquivoEntrada[100], arquivoSaida[100];
-            scanf("%s %s", arquivoEntrada, arquivoSaida);
-            firstOperation(arquivoEntrada, arquivoSaida);
-        } else if (operation == 2) {
-            char nomeArquivo[100];
-            scanf("%s", nomeArquivo);
-            Funcionalidade2(nomeArquivo);
-        } else if (operation == 3) {
-            break;
-        } else {
-            //printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
-        }
+    if (operation == 1) {
+        char arquivoEntrada[100], arquivoSaida[100];
+        scanf("%s %s", arquivoEntrada, arquivoSaida);
+        firstOperation(arquivoEntrada, arquivoSaida);
+    } else if (operation == 2) {
+        char nomeArquivo[100];
+        scanf("%s", nomeArquivo);
+        Funcionalidade2(nomeArquivo);
     }
 
     //printf("Saindo..."); //lembrar de comentar antes de enviar
@@ -48,7 +41,7 @@ int main() {
     return 0;
 }
 
-void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
+void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
     FILE *fp = fopen(arquivoEntrada, "r");
     FILE *out = fopen(arquivoSaida, "wb");
 
@@ -70,79 +63,85 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
 
         char idNascimento[4] = {0};
         char idadeMae[4] = {0};
-        r->cidadeBebe = (char*) malloc (30*sizeof(char));
-        r->cidadeMae = (char*) malloc (30*sizeof(char));
+        r->cidadeBebe = (char *) malloc(30 * sizeof(char));
+        r->cidadeMae = (char *) malloc(30 * sizeof(char));
 
         int i = 0;
         int j = 0;
 
         //sscanf(tmp, "%128[^,],%128[^,],%d[^,],%d[^,],%10[^,],%d[^,],%2[^,],%2[^\n]", r->cidadeMae, r->cidadeBebe, &r->idNascimento, &r->idadeMae, r->dataNascimento, &r->sexoBebe, r->estadoMae, r->estadoBebe);
 
-        for(;;i++) {
-            if(tmp[i]==','){
+        for (;; i++) {
+            if (tmp[i] == ',') {
                 i++;
                 break;
             }
             r->cidadeMae[i] = tmp[i];
-        } r->cidadeMae[i-1] = '\0';
+        }
+        r->cidadeMae[i - 1] = '\0';
         r->cidadeMae_size = strlen(r->cidadeMae);
 
-        for(;;i++,j++) {
-                if(tmp[i]==','){
-                    i++;
-                    break;
-                }
+        for (;; i++, j++) {
+            if (tmp[i] == ',') {
+                i++;
+                break;
+            }
             r->cidadeBebe[j] = tmp[i];
-        } r->cidadeBebe[j] = '\0';
+        }
+        r->cidadeBebe[j] = '\0';
         r->cidadeBebe_size = strlen(r->cidadeBebe);
-        for(j=0;;j++,i++) {
-            if(tmp[i]==','){
+        for (j = 0;; j++, i++) {
+            if (tmp[i] == ',') {
                 i++;
                 break;
             }
             idNascimento[j] = tmp[i];
         }
         r->idNascimento = strtol(idNascimento, NULL, 10);
-        for(j=0;;j++,i++) {
-            if(tmp[i]==','){
+        for (j = 0;; j++, i++) {
+            if (tmp[i] == ',') {
                 i++;
                 break;
             }
             idadeMae[j] = tmp[i];
         }
         r->idadeMae = strtol(idadeMae, NULL, 10);
-        for(j=0;;j++,i++) {
-            if(tmp[i]==','){
+        for (j = 0;; j++, i++) {
+            if (tmp[i] == ',') {
                 i++;
                 break;
             }
-            r->dataNascimento[j]=tmp[i];
-        } r->dataNascimento[j]='\0';
+            r->dataNascimento[j] = tmp[i];
+        }
+        r->dataNascimento[j] = '\0';
         char aux = tmp[i++];
-        if(aux!=','){
+        if (aux != ',') {
             r->sexoBebe = aux - '0';
         } else {
-            r->sexoBebe = 0; i--;
+            r->sexoBebe = 0;
+            i--;
         }
         i++;
-        for(j=0;;j++,i++) {
-            if(tmp[i]==','){
+        for (j = 0;; j++, i++) {
+            if (tmp[i] == ',') {
                 i++;
                 break;
             }
-            r->estadoMae[j]=tmp[i];
-        } r->estadoMae[j]='\0';
-        for(j=0;;j++,i++) {
-            if(tmp[i]==',' || tmp[i]=='\n'){
+            r->estadoMae[j] = tmp[i];
+        }
+        r->estadoMae[j] = '\0';
+        for (j = 0;; j++, i++) {
+            if (tmp[i] == ',' || tmp[i] == '\n') {
                 i++;
                 break;
             }
-            r->estadoBebe[j]=tmp[i];
-        } r->estadoBebe[j]='\0';
+            r->estadoBebe[j] = tmp[i];
+        }
+        r->estadoBebe[j] = '\0';
 
 
-        //printRegister(r);
-        //puts(tmp);
+//        printRegister(r);
+//        puts(tmp);
 
         // Add a new register to the binary file
         addRegister(out, r, rh);
@@ -160,7 +159,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
     fclose(fp);
     fclose(out);
 
-    binarioNaTela("out.bin");
+    binarioNaTela(arquivoSaida);
 }
 
 void Funcionalidade2(char *nomeArquivo) {
@@ -187,26 +186,40 @@ void Funcionalidade2(char *nomeArquivo) {
         r = readRegister(fp, RRN - 1);
 
 
+        char estadoBebe[3];
+        char estadoMae[3];
+        char *cidadeMae;
+        char *cidadebebe;
+        if (r->estadoBebe == NULL) {
+
+        }
+
         if (r->sexoBebe == 0) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo IGNORADO.\n",
-                   r->cidadeBebe,
-                   r->estadoBebe,
-                   r->dataNascimento
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
             );
         } else if (r->sexoBebe == 1) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo MASCULINO.\n",
-                   r->cidadeBebe,
-                   r->estadoBebe,
-                   r->dataNascimento
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo MASCULINO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
             );
         } else if (r->sexoBebe == 2) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo FEMININO.\n",
-                   r->cidadeBebe,
-                   r->estadoBebe,
-                   r->dataNascimento
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo FEMININO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
             );
         } else {
-            printf("leu errado (%d)\n", r->sexoBebe);
+            printRegister(r);
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%d).\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-",
+                   r->sexoBebe
+            );
         }
 
         freeRegister(&r);
