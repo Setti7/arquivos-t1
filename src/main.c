@@ -1,8 +1,8 @@
 /*
- * Organização de Arquivos - T1
+ * Organiza��o de Arquivos - T1
  *
  * Feito por:
- *  André Niero Setti - 10883901
+ *  Andr� Niero Setti - 10883901
  *  Leonardo Chieppe  - 9368730
  *
  * */
@@ -38,7 +38,7 @@ int main() {
         } else if (operation == 3) {
             break;
         } else {
-            printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
+            printf("Opera��o inv�lida.\n"); //lembrar de comentar antes de enviar
         }
     }
 
@@ -102,7 +102,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
             }
             idNascimento[j] = tmp[i];
         }
-        r->idNascimento = atoi(idNascimento);
+        r->idNascimento = strtol(idNascimento, NULL, 10);
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
                 i++;
@@ -110,7 +110,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
             }
             idadeMae[j] = tmp[i];
         }
-        r->idadeMae = atoi(idadeMae);
+        r->idadeMae = strtol(idadeMae, NULL, 10);
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
                 i++; j++;
@@ -123,16 +123,17 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
             r->sexoBebe = aux - '0';
         } else
             r->sexoBebe = 0;
-
+        i++;
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
-                i++; j++;
+                i++; if(j!=0) j++;
                 break;
             }
+
             r->estadoMae[j]=tmp[i];
         } r->estadoMae[j]='\0';
         for(j=0;;j++,i++) {
-            if(tmp[i]==','){
+            if(tmp[i]==',' || tmp[i]=='\n'){
                 i++; j++;
                 break;
             }
@@ -147,7 +148,8 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         addRegister(out, r, rh);
 
         free(tmp);
-
+        free(r->cidadeBebe);
+        free(r->cidadeMae);
         c++;
     }
 
@@ -217,9 +219,9 @@ void Funcionalidade2(char *nomeArquivo) {
 
 
 void printOptions() {
-    printf("Escolha a operação:\n");
-    printf("[1] Operação 1.\n");
-    printf("[2] Operação 2.\n");
+    printf("Escolha a opera��o:\n");
+    printf("[1] Opera��o 1.\n");
+    printf("[2] Opera��o 2.\n");
     printf("[3] Sair.\n");
 }
 
