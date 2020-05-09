@@ -37,10 +37,14 @@ void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh);
 
 Registro *readRegister(FILE *fp, int RRN);
 
+RegistroHeader *readRegisterHeader(FILE *fp);
+
 void printRegister(Registro *r);
 
 Registro *initRegister();
 
 RegistroHeader *initRegisterHeader();
+
+void freeRegister(Registro **r);
 
 #endif //T1_REGISTER_H

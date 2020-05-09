@@ -5,11 +5,11 @@
 
 
 Registro *initRegister() {
-    return (Registro *) calloc(1, sizeof(Registro));
+    return calloc(1, sizeof(Registro));
 }
 
 RegistroHeader *initRegisterHeader() {
-    return (RegistroHeader *) calloc(1, sizeof(RegistroHeader));
+    return calloc(1, sizeof(RegistroHeader));
 }
 
 void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
@@ -84,11 +84,23 @@ Registro *readRegister(FILE *fp, int RRN) {
     fread(&r->cidadeMae_size, sizeof(int), 1, fp);
     fread(&r->cidadeBebe_size, sizeof(int), 1, fp);
 
-    r->cidadeMae = (char *) malloc(r->cidadeMae_size * sizeof(char));
-    r->cidadeBebe = (char *) malloc(r->cidadeBebe_size * sizeof(char));
 
-    fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
-    fread(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
+    if (r->cidadeMae_size > 0) {
+        // tamanho alocado da string é 1 a mais para caber o \0
+        r->cidadeMae = calloc(1, (r->cidadeMae_size + 1) * sizeof(char));
+        fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
+    } else {
+        r->cidadeMae = "\0";
+    }
+
+    if (r->cidadeBebe_size > 0) {
+        // tamanho alocado da string é 1 a mais para caber o \0
+        r->cidadeBebe = calloc(1, (r->cidadeBebe_size + 1) * sizeof(char));
+        fread(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
+    } else {
+        r->cidadeBebe = "\0";
+    }
+
 
     fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
 
@@ -121,4 +133,11 @@ void printRegister(Registro *r) {
     printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
            r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
            r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
+}
+
+void freeRegister(Registro **r) {
+    if ((*r)->cidadeMae_size > 0) free((*r)->cidadeMae);
+    if ((*r)->cidadeBebe_size > 0) free((*r)->cidadeBebe);
+    free(*r);
+    *r = NULL;
 }

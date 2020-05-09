@@ -16,7 +16,7 @@ void firstOperation();
 
 void printOptions();
 
-void Funcionalidade2();
+void Funcionalidade2(char *nomeArquivo);
 
 int main() {
 
@@ -97,13 +97,11 @@ void firstOperation() {
 
         free(tmp);
         c++;
-        if (c == 10)
-            break;
     }
 
     printf("Leu todo o arquivo: %d\n", c == 1501);
 
-    free(r);
+    freeRegister(&r);
     free(rh);
 
     fclose(fp);
@@ -113,78 +111,56 @@ void firstOperation() {
 }
 
 void Funcionalidade2(char *nomeArquivo) {
-    FILE *arquivoBinario = fopen(nomeArquivo, "rb");
-    Registro *reg = initRegister();
+    FILE *fp = fopen(nomeArquivo, "rb");
 
     //se houver erro na abertura do arquivo
-    if (arquivoBinario == NULL) {
+    if (fp == NULL) {
         printf("Falha no processamento do arquivo.");
         return;
     }
 
     //se nao houverem registros no arquivo
-    if (feof(arquivoBinario)) {
+    if (feof(fp)) {
         printf("Registro inexistente.");
-        fclose(arquivoBinario);
+        fclose(fp);
         return;
     }
 
-    fseek(arquivoBinario, 128, SEEK_SET); //pula o cabecalho
-
-    //enquanto ainda houver registros a serem lidos
     int RRN = 0;
-    while (RRN != 10) {
+    RegistroHeader *rh = readRegisterHeader(fp);
+    Registro *r;
+    while (RRN != rh->RRNproxRegistro) {
         RRN++;
-        //le 1 registro
-        int pos;
-        pos = ftell(arquivoBinario);
+        r = readRegister(fp, RRN - 1);
 
-        fread(&reg->cidadeMae_size, sizeof(int), 1, arquivoBinario); //pega o tamanho do campo cidadeMae
-        fread(&reg->cidadeBebe_size, sizeof(int), 1, arquivoBinario); //pega o tamanho do campo cidadeBebe
-        fseek(arquivoBinario, reg->cidadeMae_size, SEEK_CUR); //pula para o campo cidadeBebe
-        reg->cidadeBebe = (char *) malloc(reg->cidadeBebe_size * sizeof(char)); //aloca o espaco da cidadeBebe
-        fread(reg->cidadeBebe, reg->cidadeBebe_size * sizeof(char), 1, arquivoBinario);
-        fseek(arquivoBinario, 97 - reg->cidadeBebe_size - reg->cidadeMae_size, SEEK_CUR);
 
-        pos = ftell(arquivoBinario);
-
-        fread(&reg->idNascimento, sizeof(int), 1, arquivoBinario);
-        fread(&reg->idadeMae, sizeof(int), 1, arquivoBinario);
-
-        fread(&reg->dataNascimento, 10 * sizeof(char), 1, arquivoBinario);
-        fread(&reg->sexoBebe, sizeof(char), 1, arquivoBinario);
-        fread(&reg->estadoMae, 2 * sizeof(char), 1, arquivoBinario);
-        fread(&reg->estadoBebe, 2 * sizeof(char), 1, arquivoBinario);
-
-        Registro *r = readRegister(arquivoBinario, RRN - 1);
-
-        if (reg->sexoBebe == 0) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo IGNORADO.\n", reg->cidadeBebe, reg->estadoBebe,
-                   reg->dataNascimento);
-        } else if (reg->sexoBebe == 1) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo MASCULINO.\n", reg->cidadeBebe, reg->estadoBebe,
-                   reg->dataNascimento);
-        } else if (reg->sexoBebe == 2) {
-            printf("Nasceu em %s/%s, em %s, um bebe de sexo FEMININO.\n", reg->cidadeBebe, reg->estadoBebe,
-                   reg->dataNascimento);
-        } else {
-            printf("Bebe alienigena (%d)\n", reg->sexoBebe);
-        }
         if (r->sexoBebe == 0) {
-            printf("[R] Nasceu em %s/%s, em %s, um bebe de sexo IGNORADO.\n", r->cidadeBebe, r->estadoBebe,
-                   r->dataNascimento);
+            printf("Nasceu em %s/%s, em %s, um bebe de sexo IGNORADO.\n",
+                   r->cidadeBebe,
+                   r->estadoBebe,
+                   r->dataNascimento
+            );
         } else if (r->sexoBebe == 1) {
-            printf("[R] Nasceu em %s/%s, em %s, um bebe de sexo MASCULINO.\n", r->cidadeBebe, r->estadoBebe,
-                   r->dataNascimento);
+            printf("Nasceu em %s/%s, em %s, um bebe de sexo MASCULINO.\n",
+                   r->cidadeBebe,
+                   r->estadoBebe,
+                   r->dataNascimento
+            );
         } else if (r->sexoBebe == 2) {
-            printf("[R] Nasceu em %s/%s, em %s, um bebe de sexo FEMININO.\n", r->cidadeBebe, r->estadoBebe,
-                   r->dataNascimento);
-        }else {
-            printf("[R] Bebe alienigena (%d)\n", r->sexoBebe);
+            printf("Nasceu em %s/%s, em %s, um bebe de sexo FEMININO.\n",
+                   r->cidadeBebe,
+                   r->estadoBebe,
+                   r->dataNascimento
+            );
+        } else {
+            printf("leu errado (%d)\n", r->sexoBebe);
         }
 
+        freeRegister(&r);
     }
-    fclose(arquivoBinario);
+
+    free(rh);
+    fclose(fp);
 }
 
 
