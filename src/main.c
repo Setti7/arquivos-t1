@@ -24,7 +24,7 @@ int main() {
     int operation = 0;
 
     while (1) {
-        printOptions(); //lembrar de comentar antes de enviar
+        //printOptions(); //lembrar de comentar antes de enviar
         scanf("%d", &operation);
 
         if (operation == 1) {
@@ -38,7 +38,7 @@ int main() {
         } else if (operation == 3) {
             break;
         } else {
-            printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
+            //printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
         }
     }
 
@@ -121,8 +121,9 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         char aux = tmp[i++];
         if(aux!=','){
             r->sexoBebe = aux - '0';
-        } else
-            r->sexoBebe = 0;
+        } else {
+            r->sexoBebe = 0; i--;
+        }
         i++;
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
@@ -147,8 +148,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         addRegister(out, r, rh);
 
         free(tmp);
-        free(r->cidadeBebe);
-        free(r->cidadeMae);
+
         c++;
     }
 
