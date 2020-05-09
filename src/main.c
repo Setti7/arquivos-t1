@@ -42,7 +42,7 @@ int main() {
         }
     }
 
-    printf("Saindo..."); //lembrar de comentar antes de enviar
+    //printf("Saindo..."); //lembrar de comentar antes de enviar
     fclose(fp);
 
     return 0;
@@ -141,8 +141,8 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         } r->estadoBebe[j]='\0';
 
 
-        printRegister(r);
-        puts(tmp);
+        //printRegister(r);
+        //puts(tmp);
 
         // Add a new register to the binary file
         addRegister(out, r, rh);
@@ -152,7 +152,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         c++;
     }
 
-    printf("Leu todo o arquivo: %d\n", c == 1501);
+    //printf("Leu todo o arquivo: %d\n", c == 1501);
 
     freeRegister(&r);
     free(rh);
