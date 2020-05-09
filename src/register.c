@@ -5,7 +5,7 @@
 
 
 Registro *initRegister() {
-    return (Registro *) malloc(sizeof(Registro));
+    return (Registro *) calloc(1, sizeof(Registro));
 }
 
 RegistroHeader *initRegisterHeader() {
@@ -26,8 +26,6 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
     char t[111];
     memset(t, '$', 111);
     fwrite(&t, sizeof(char), 111, fp);
-
-    fseek(fp, 0, SEEK_END);
 }
 
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
@@ -43,7 +41,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 
     // Go to the next RRN position
     int RRN = rh->RRNproxRegistro;
-    fseek(fp, SEEK_SET, 128 + (RRN * 128));
+    fseek(fp, 128 + (RRN * 128), SEEK_SET);
 
     // Write all fields
 
@@ -55,8 +53,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
 
-    // Skip the rest of the dynamic fields
-    fseek(fp, 99 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
 
     fwrite(&r->idNascimento, sizeof(int), 1, fp);
     fwrite(&r->idadeMae, sizeof(int), 1, fp);
@@ -78,6 +75,47 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 void updateRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
 
 void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
+
+Registro *readRegister(FILE *fp, int RRN) {
+    // Go to the next RRN position
+    fseek(fp, 128 + (RRN * 128), SEEK_SET);
+    Registro *r = initRegister();
+
+    fread(&r->cidadeMae_size, sizeof(int), 1, fp);
+    fread(&r->cidadeBebe_size, sizeof(int), 1, fp);
+
+    r->cidadeMae = (char *) malloc(r->cidadeMae_size * sizeof(char));
+    r->cidadeBebe = (char *) malloc(r->cidadeBebe_size * sizeof(char));
+
+    fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
+    fread(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
+
+    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+
+    fread(&r->idNascimento, sizeof(int), 1, fp);
+    fread(&r->idadeMae, sizeof(int), 1, fp);
+
+    fread(&r->dataNascimento, sizeof(char), 10, fp);
+    fread(&r->sexoBebe, sizeof(char), 1, fp);
+    fread(&r->estadoMae, sizeof(char), 2, fp);
+    fread(&r->estadoBebe, sizeof(char), 2, fp);
+
+    return r;
+}
+
+RegistroHeader *readRegisterHeader(FILE *fp) {
+    fseek(fp, 0, SEEK_SET);
+
+    RegistroHeader *rh = initRegisterHeader();
+
+    fread(&rh->status, sizeof(char), 1, fp);
+    fread(&rh->RRNproxRegistro, sizeof(int), 1, fp);
+    fread(&rh->numeroRegistrosInseridos, sizeof(int), 1, fp);
+    fread(&rh->numeroRegistrosRemovidos, sizeof(int), 1, fp);
+    fread(&rh->numeroRegistrosAtualizados, sizeof(int), 1, fp);
+
+    return rh;
+}
 
 void printRegister(Registro *r) {
     printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,

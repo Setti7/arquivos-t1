@@ -35,6 +35,8 @@ void updateRegister(FILE *fp, Registro *r, RegistroHeader *rh);
 
 void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh);
 
+Registro *readRegister(FILE *fp, int RRN);
+
 void printRegister(Registro *r);
 
 Registro *initRegister();
