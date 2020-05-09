@@ -1,8 +1,8 @@
 /*
- * Organiza��o de Arquivos - T1
+ * Organização de Arquivos - T1
  *
  * Feito por:
- *  Andr� Niero Setti - 10883901
+ *  André Niero Setti - 10883901
  *  Leonardo Chieppe  - 9368730
  *
  * */
@@ -38,7 +38,7 @@ int main() {
         } else if (operation == 3) {
             break;
         } else {
-            printf("Opera��o inv�lida.\n"); //lembrar de comentar antes de enviar
+            printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
         }
     }
 
@@ -70,8 +70,8 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
 
         char idNascimento[4] = {0};
         char idadeMae[4] = {0};
-        r->cidadeBebe = (char*) malloc (128*sizeof(char));
-        r->cidadeMae = (char*) malloc (128*sizeof(char));
+        r->cidadeBebe = (char*) malloc (30*sizeof(char));
+        r->cidadeMae = (char*) malloc (30*sizeof(char));
 
         int i = 0;
         int j = 0;
@@ -84,12 +84,12 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
                 break;
             }
             r->cidadeMae[i] = tmp[i];
-        } r->cidadeMae[i] = '\0';
+        } r->cidadeMae[i-1] = '\0';
         r->cidadeMae_size = strlen(r->cidadeMae);
 
         for(;;i++,j++) {
                 if(tmp[i]==','){
-                    i++; j++;
+                    i++;
                     break;
                 }
             r->cidadeBebe[j] = tmp[i];
@@ -113,7 +113,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         r->idadeMae = strtol(idadeMae, NULL, 10);
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
-                i++; j++;
+                i++;
                 break;
             }
             r->dataNascimento[j]=tmp[i];
@@ -126,15 +126,14 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         i++;
         for(j=0;;j++,i++) {
             if(tmp[i]==','){
-                i++; if(j!=0) j++;
+                i++;
                 break;
             }
-
             r->estadoMae[j]=tmp[i];
         } r->estadoMae[j]='\0';
         for(j=0;;j++,i++) {
             if(tmp[i]==',' || tmp[i]=='\n'){
-                i++; j++;
+                i++;
                 break;
             }
             r->estadoBebe[j]=tmp[i];
@@ -219,9 +218,9 @@ void Funcionalidade2(char *nomeArquivo) {
 
 
 void printOptions() {
-    printf("Escolha a opera��o:\n");
-    printf("[1] Opera��o 1.\n");
-    printf("[2] Opera��o 2.\n");
+    printf("Escolha a operação:\n");
+    printf("[1] Operação 1.\n");
+    printf("[2] Operação 2.\n");
     printf("[3] Sair.\n");
 }
 
