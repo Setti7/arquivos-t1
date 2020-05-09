@@ -1,17 +1,23 @@
-all: clear parseCsv.o main.o
-	gcc -g parseCsv.o main.o -o main -Wall -lm
+all: clear dir register binarioNaTela main
+	gcc -g build/register.o build/binarioNaTela.o build/main.o -o main -Wall -lm
 
-parseCsv.o:
-	gcc -g -c parseCsv.c -o parseCsv.o
+dir:
+	mkdir build/
 
-main.o:
-	gcc -g -c main.c -o main.o
+binarioNaTela:
+	gcc -g -c src/binarioNaTela.c -o build/binarioNaTela.o
+
+register:
+	gcc -g -c src/register.c -o build/register.o
+
+main:
+	gcc -g -c src/main.c -o build/main.o
 
 clear:
-	rm -f *.o
+	rm -rf build/
 
 run:
 	./main
 
-debug: clear parseCsv.o main.o
-	gcc -g parseCsv.o main.o -o main -Wall -lm -fsanitize=address
+debug: clear register binarioNaTela main
+	gcc -g build/register.o build/binarioNaTela.o build/main.o -o main -Wall -lm -fsanitize=address

@@ -1,6 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "register.h"
+
+
+Registro *initRegister() {
+    return (Registro *) malloc(sizeof(Registro));
+}
+
+RegistroHeader *initRegisterHeader() {
+    return (RegistroHeader *) calloc(1, sizeof(RegistroHeader));
+}
 
 void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
     fseek(fp, 0, SEEK_SET);
@@ -12,6 +22,7 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
     fwrite(&rh->numeroRegistrosRemovidos, sizeof(int), 1, fp);
     fwrite(&rh->numeroRegistrosAtualizados, sizeof(int), 1, fp);
 
+    // fill the rest with $
     char t[111];
     memset(t, '$', 111);
     fwrite(&t, sizeof(char), 111, fp);
@@ -20,7 +31,13 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
 }
 
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
-    // Set the register status to 0
+    /*
+     * TODO: Ainda é necessário tratar nulos. Apenas o idNascimento é não-nulo.
+     * Todos os campos nulos string FIXOS devem ser do tipo \0$$$$.... até completar o tamanho do campo.
+     * Todos os campos nulos int/float/double FIXOS devem ser do tipo -1.
+     * */
+
+    // Set the register status to 0 (busy)
     rh->status = 0;
     writeHeaderRegister(fp, rh);
 
@@ -30,7 +47,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 
     // Write all fields
 
-    // Write the lenght of dynamic fields
+    // Write the length of dynamic fields
     fwrite(&r->cidadeMae_size, sizeof(int), 1, fp);
     fwrite(&r->cidadeBebe_size, sizeof(int), 1, fp);
 
@@ -41,11 +58,10 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     // Skip the rest of the dynamic fields
     fseek(fp, 99 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
 
-
     fwrite(&r->idNascimento, sizeof(int), 1, fp);
     fwrite(&r->idadeMae, sizeof(int), 1, fp);
 
-    fwrite(&r->dataNascimento, sizeof(char), 10, fp); // todo: tratar nulo
+    fwrite(&r->dataNascimento, sizeof(char), 10, fp);
 
     fwrite(&r->sexoBebe, sizeof(char), 1, fp);
 
@@ -59,16 +75,12 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     writeHeaderRegister(fp, rh);
 }
 
-void updateRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
+void updateRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
 
-}
-
-void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
-
-}
+void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
 
 void printRegister(Registro *r) {
-    printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |", r->cidadeMae, r->cidadeMae_size,
+    printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
            r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
            r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
 }
