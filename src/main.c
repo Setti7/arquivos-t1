@@ -1,8 +1,8 @@
 /*
- * Organiza��o de Arquivos - T1
+ * Organizaçãoo de Arquivos - T1
  *
  * Feito por:
- *  Andr� Niero Setti - 10883901
+ *  André Niero Setti - 10883901
  *  Leonardo Chieppe  - 9368730
  *
  * */
@@ -134,7 +134,7 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
         }
         r->estadoBebe[j] = '\0';
 
-
+//        DEBUG
 //        printRegister(r);
 //        puts(tmp);
 

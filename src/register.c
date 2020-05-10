@@ -9,7 +9,9 @@ Registro *initRegister() {
 }
 
 RegistroHeader *initRegisterHeader() {
-    return calloc(1, sizeof(RegistroHeader));
+    RegistroHeader *rh = calloc(1, sizeof(RegistroHeader));
+    rh->status = '1';
+    return rh;
 }
 
 void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
@@ -31,9 +33,16 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     /*
      * TODO: Ainda é necessário tratar nulos. Apenas o idNascimento é não-nulo.
+     *
+     * TODO:                        1 arq02.csv out.bin
+     *
      * Todos os campos nulos string FIXOS devem ser do tipo \0$$$$.... até completar o tamanho do campo.
      * Todos os campos nulos int/float/double FIXOS devem ser do tipo -1.
      * */
+
+    // trash
+    char t[128];
+    memset(t, '$', 128);
 
     // Set the register status to 0 (busy)
     rh->status = '0';
@@ -53,18 +62,48 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
 
-    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+    // fill the rest with trash
+    fwrite(&t, sizeof(char), 97 - r->cidadeBebe_size - r->cidadeMae_size, fp);
 
+    // idNascimento não precisa tratar pois nunca é nulo
     fwrite(&r->idNascimento, sizeof(int), 1, fp);
-    fwrite(&r->idadeMae, sizeof(int), 1, fp);
 
-    fwrite(&r->dataNascimento, sizeof(char), 10, fp);
+    // Tratamento da idadeMae
+    if (r->idadeMae <= 0) {
+        int idadeMaeInvalida = -1;
+        fwrite(&idadeMaeInvalida, sizeof(int), 1, fp);
+    } else {
+        fwrite(&r->idadeMae, sizeof(int), 1, fp);
+    }
 
-    // 1 arq02.csv out.bin
+    // Tratamento da data de nascimento
+    if (strlen(r->dataNascimento) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 10, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->dataNascimento, sizeof(char), 10, fp);
+    }
+
     fwrite(&r->sexoBebe, sizeof(char), 1, fp);
 
-    fwrite(&r->estadoMae, sizeof(char), 2, fp);
-    fwrite(&r->estadoBebe, sizeof(char), 2, fp);
+    // Tratamento estadoMae
+    if (strlen(r->estadoMae) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoMae, sizeof(char), 2, fp);
+    }
+
+    // Tratamento estadoBebe
+    if (strlen(r->estadoBebe) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoBebe, sizeof(char), 2, fp);
+    }
 
     // Update the header
     rh->status = '1';
