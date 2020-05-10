@@ -60,6 +60,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 
     fwrite(&r->dataNascimento, sizeof(char), 10, fp);
 
+    // 1 arq02.csv out.bin
     fwrite(&r->sexoBebe, sizeof(char), 1, fp);
 
     fwrite(&r->estadoMae, sizeof(char), 2, fp);
@@ -130,9 +131,9 @@ RegistroHeader *readRegisterHeader(FILE *fp) {
 }
 
 void printRegister(Registro *r) {
-    printf("Registro: %s (%d) | %s (%d) | %d | %d | %s | %d | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
-           r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
-           r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
+    fprintf(stderr, "Registro: %s (%d) | %s (%d) | %d | %d | %s | %c | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
+            r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
+            r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
 }
 
 void freeRegister(Registro **r) {

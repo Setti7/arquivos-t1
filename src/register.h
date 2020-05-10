@@ -18,10 +18,10 @@ struct registro {
     char *cidadeBebe;
     int idNascimento;
     int idadeMae;
-    char dataNascimento[10];
-    int sexoBebe;
-    char estadoMae[2];
-    char estadoBebe[2];
+    char dataNascimento[11];
+    char sexoBebe;
+    char estadoMae[3];
+    char estadoBebe[3];
 };
 
 typedef struct registroHeader RegistroHeader;
