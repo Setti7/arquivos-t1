@@ -19,7 +19,7 @@ struct registro {
     int idNascimento;
     int idadeMae;
     char dataNascimento[11];
-    char sexoBebe;
+    int sexoBebe;
     char estadoMae[3];
     char estadoBebe[3];
 };
