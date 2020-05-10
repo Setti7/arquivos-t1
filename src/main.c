@@ -1,8 +1,8 @@
 /*
- * OrganizaÃ§Ã£o de Arquivos - T1
+ * Organização de Arquivos - T1
  *
  * Feito por:
- *  AndrÃ© Niero Setti - 10883901
+ *  André Niero Setti - 10883901
  *  Leonardo Chieppe  - 9368730
  *
  * */
@@ -24,7 +24,7 @@ int main() {
     int operation = 0;
 
     while (1) {
-        //printOptions(); //lembrar de comentar antes de enviar
+        printOptions(); //lembrar de comentar antes de enviar
         scanf("%d", &operation);
 
         if (operation == 1) {
@@ -38,11 +38,11 @@ int main() {
         } else if (operation == 3) {
             break;
         } else {
-            //printf("OperaÃ§Ã£o invÃ¡lida.\n"); //lembrar de comentar antes de enviar
+            printf("Operação inválida.\n"); //lembrar de comentar antes de enviar
         }
     }
 
-    //printf("Saindo..."); //lembrar de comentar antes de enviar
+    printf("Saindo..."); //lembrar de comentar antes de enviar
     fclose(fp);
 
     return 0;
@@ -58,6 +58,7 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
 
     Registro *r = initRegister();
     RegistroHeader *rh = initRegisterHeader();
+    writeHeaderRegister(out,rh);
 
 
     while (fgets(line, 1024, fp)) {
@@ -141,8 +142,8 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         } r->estadoBebe[j]='\0';
 
 
-        //printRegister(r);
-        //puts(tmp);
+        printRegister(r);
+        puts(tmp);
 
         // Add a new register to the binary file
         addRegister(out, r, rh);
@@ -152,8 +153,8 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
         c++;
     }
 
-    //printf("Leu todo o arquivo: %d\n", c == 1501);
-
+    printf("Leu todo o arquivo: %d\n", c == 1501);
+    writeHeaderRegister(out,rh);
     freeRegister(&r);
     free(rh);
 
@@ -163,12 +164,24 @@ void firstOperation(char* arquivoEntrada, char* arquivoSaida) {
     binarioNaTela("out.bin");
 }
 
+void FalhaProcessamento(){
+    printf("Falha no processamento do arquivo.");
+    return;
+}
+
 void Funcionalidade2(char *nomeArquivo) {
     FILE *fp = fopen(nomeArquivo, "rb");
 
     //se houver erro na abertura do arquivo
     if (fp == NULL) {
-        printf("Falha no processamento do arquivo.");
+        FalhaProcessamento();
+        return;
+    }
+    int RRN = 0;
+    RegistroHeader *rh = readRegisterHeader(fp);
+    Registro *r;
+    if(rh->status!='1') {
+        FalhaProcessamento();
         return;
     }
 
@@ -179,9 +192,7 @@ void Funcionalidade2(char *nomeArquivo) {
         return;
     }
 
-    int RRN = 0;
-    RegistroHeader *rh = readRegisterHeader(fp);
-    Registro *r;
+
     while (RRN != rh->RRNproxRegistro) {
         RRN++;
         r = readRegister(fp, RRN - 1);
@@ -218,9 +229,9 @@ void Funcionalidade2(char *nomeArquivo) {
 
 
 void printOptions() {
-    printf("Escolha a operaÃ§Ã£o:\n");
-    printf("[1] OperaÃ§Ã£o 1.\n");
-    printf("[2] OperaÃ§Ã£o 2.\n");
+    printf("Escolha a operação:\n");
+    printf("[1] Operação 1.\n");
+    printf("[2] Operação 2.\n");
     printf("[3] Sair.\n");
 }
 

@@ -36,7 +36,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
      * */
 
     // Set the register status to 0 (busy)
-    rh->status = 0;
+    rh->status = '0';
     writeHeaderRegister(fp, rh);
 
     // Go to the next RRN position
@@ -66,7 +66,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     fwrite(&r->estadoBebe, sizeof(char), 2, fp);
 
     // Update the header
-    rh->status = 1;
+    rh->status = '1';
     rh->RRNproxRegistro++;
     rh->numeroRegistrosInseridos++;
     writeHeaderRegister(fp, rh);
