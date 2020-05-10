@@ -24,21 +24,13 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
     fwrite(&rh->numeroRegistrosRemovidos, sizeof(int), 1, fp);
     fwrite(&rh->numeroRegistrosAtualizados, sizeof(int), 1, fp);
 
-    // fill the rest with $
+    // fill the rest with trash
     char t[111];
     memset(t, '$', 111);
     fwrite(&t, sizeof(char), 111, fp);
 }
 
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
-    /*
-     * TODO: Ainda é necessário tratar nulos. Apenas o idNascimento é não-nulo.
-     *
-     * TODO:                        1 arq02.csv out.bin
-     *
-     * Todos os campos nulos string FIXOS devem ser do tipo \0$$$$.... até completar o tamanho do campo.
-     * Todos os campos nulos int/float/double FIXOS devem ser do tipo -1.
-     * */
 
     // trash
     char t[128];
@@ -62,7 +54,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
 
-    // fill the rest with trash
+    // fill the remaining space with trash
     fwrite(&t, sizeof(char), 97 - r->cidadeBebe_size - r->cidadeMae_size, fp);
 
     // idNascimento não precisa tratar pois nunca é nulo
@@ -121,9 +113,10 @@ Registro *readRegister(FILE *fp, int RRN) {
     fseek(fp, 128 + (RRN * 128), SEEK_SET);
     Registro *r = initRegister();
 
+    // Read all fields
+
     fread(&r->cidadeMae_size, sizeof(int), 1, fp);
     fread(&r->cidadeBebe_size, sizeof(int), 1, fp);
-
 
     if (r->cidadeMae_size > 0) {
         // tamanho alocado da string é 1 a mais para caber o \0
@@ -141,7 +134,7 @@ Registro *readRegister(FILE *fp, int RRN) {
         r->cidadeBebe = "\0";
     }
 
-
+    // Skip the remaining space of trash
     fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
 
     fread(&r->idNascimento, sizeof(int), 1, fp);
@@ -176,8 +169,6 @@ void printRegister(Registro *r) {
 }
 
 void freeRegister(Registro **r) {
-    if ((*r)->cidadeMae_size > 0) free((*r)->cidadeMae);
-    if ((*r)->cidadeBebe_size > 0) free((*r)->cidadeBebe);
     free(*r);
     *r = NULL;
 }

@@ -42,11 +42,8 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
     char line[1024];
     int c = 0;
 
-
-    Registro *r = initRegister();
     RegistroHeader *rh = initRegisterHeader();
     writeHeaderRegister(out, rh);
-
 
     while (fgets(line, 1024, fp)) {
         if (c == 0) {
@@ -58,14 +55,15 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
 
         char idNascimento[4] = {0};
         char idadeMae[4] = {0};
-        r->cidadeBebe = (char *) malloc(30 * sizeof(char));
-        r->cidadeMae = (char *) malloc(30 * sizeof(char));
+
+        Registro *r = initRegister();
+        r->cidadeBebe = calloc(128, sizeof(char));
+        r->cidadeMae = calloc(128, sizeof(char));
 
         int i = 0;
         int j = 0;
 
-        //sscanf(tmp, "%128[^,],%128[^,],%d[^,],%d[^,],%10[^,],%d[^,],%2[^,],%2[^\n]", r->cidadeMae, r->cidadeBebe, &r->idNascimento, &r->idadeMae, r->dataNascimento, &r->sexoBebe, r->estadoMae, r->estadoBebe);
-
+        // Começa parse maluco do csv
         for (;; i++) {
             if (tmp[i] == ',') {
                 i++;
@@ -143,11 +141,13 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
 
         free(tmp);
 
+        free(r->cidadeMae);
+        free(r->cidadeBebe);
+        freeRegister(&r);
+
         c++;
     }
 
-    writeHeaderRegister(out, rh);
-    freeRegister(&r);
     free(rh);
 
     fclose(fp);
@@ -156,24 +156,19 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
     binarioNaTela(arquivoSaida);
 }
 
-void FalhaProcessamento() {
-    printf("Falha no processamento do arquivo.");
-    return;
-}
-
 void Funcionalidade2(char *nomeArquivo) {
     FILE *fp = fopen(nomeArquivo, "rb");
 
     //se houver erro na abertura do arquivo
     if (fp == NULL) {
-        FalhaProcessamento();
+        printf("Falha no processamento do arquivo.");
         return;
     }
     int RRN = 0;
     RegistroHeader *rh = readRegisterHeader(fp);
-    Registro *r;
     if (rh->status != '1') {
-        FalhaProcessamento();
+        printf("Falha no processamento do arquivo.");
+        free(rh);
         return;
     }
 
@@ -186,8 +181,8 @@ void Funcionalidade2(char *nomeArquivo) {
 
     while (RRN != rh->RRNproxRegistro) {
         RRN++;
-        r = readRegister(fp, RRN - 1);
 
+        Registro *r = readRegister(fp, RRN - 1);
 
         if (r->sexoBebe == '0') {
             printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
@@ -208,6 +203,7 @@ void Funcionalidade2(char *nomeArquivo) {
                    strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
             );
         } else {
+            // DEBUG
             printRegister(r);
             printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%c).\n",
                    r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
@@ -217,6 +213,8 @@ void Funcionalidade2(char *nomeArquivo) {
             );
         }
 
+        if (r->cidadeMae_size > 0) free(r->cidadeMae);
+        if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 
