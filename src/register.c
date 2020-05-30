@@ -104,7 +104,77 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     writeHeaderRegister(fp, rh);
 }
 
-void updateRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
+void updateRegister(FILE *fp, int RRN, Registro *r) {
+    // trash
+    char t[128];
+    memset(t, '$', 128);
+
+    // Set the register status to 0 (busy)
+    RegistroHeader *rh = readRegisterHeader(fp);
+    rh->status = '0';
+    writeHeaderRegister(fp, rh);
+
+    // Go to the RRN position
+    fseek(fp, 128 + (RRN * 128), SEEK_SET);
+
+    // Write all fields
+
+    // Write the length of dynamic fields
+    fwrite(&r->cidadeMae_size, sizeof(int), 1, fp);
+    fwrite(&r->cidadeBebe_size, sizeof(int), 1, fp);
+
+    // Write the dynamic fields
+    fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
+    fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
+
+    // skip the remaining space
+    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+
+    // idNascimento não precisa tratar pois nunca é nulo
+    fwrite(&r->idNascimento, sizeof(int), 1, fp);
+
+    // Tratamento da idadeMae
+    if (r->idadeMae <= 0) {
+        int idadeMaeInvalida = -1;
+        fwrite(&idadeMaeInvalida, sizeof(int), 1, fp);
+    } else {
+        fwrite(&r->idadeMae, sizeof(int), 1, fp);
+    }
+
+    // Tratamento da data de nascimento
+    if (strlen(r->dataNascimento) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 10, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->dataNascimento, sizeof(char), 10, fp);
+    }
+
+    fwrite(&r->sexoBebe, sizeof(char), 1, fp);
+
+    // Tratamento estadoMae
+    if (strlen(r->estadoMae) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoMae, sizeof(char), 2, fp);
+    }
+
+    // Tratamento estadoBebe
+    if (strlen(r->estadoBebe) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoBebe, sizeof(char), 2, fp);
+    }
+
+    // Update the header
+    rh->status = '1';
+    writeHeaderRegister(fp, rh);
+    free(rh);
+}
 
 void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
 

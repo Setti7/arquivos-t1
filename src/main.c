@@ -18,6 +18,8 @@ void Funcionalidade2(char *nomeArquivo);
 
 void Funcionalidade4(char *nomeArquivo, int rrn);
 
+void Funcionalidade7(char *nomeArquivo, int n);
+
 int main() {
 
     int operation = 0;
@@ -36,15 +38,20 @@ int main() {
         case 3 :
             break;
         case 4 :
-            scanf("%s %d",arquivoEntrada, &operation); //como a variavel de operacao ja foi usada, podemos reaproveitar ela pra alocar o rrn do registro desejado.
+            scanf("%s %d", arquivoEntrada,
+                  &operation); //como a variavel de operacao ja foi usada, podemos reaproveitar ela pra alocar o rrn do registro desejado.
             Funcionalidade4(arquivoEntrada, operation);
             break;
         case 5 :
             break;
         case 6 :
             break;
-        case 7 :
+        case 7 : {
+            int n = 0;
+            scanf("%s %d", arquivoEntrada, &n);
+            Funcionalidade7(arquivoEntrada, n);
             break;
+        }
     }
 
     return 0;
@@ -52,33 +59,33 @@ int main() {
 
 void PrintR(Registro *r) {
     if (r->sexoBebe == '0') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else if (r->sexoBebe == '1') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo MASCULINO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else if (r->sexoBebe == '2') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo FEMININO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else {
-            // DEBUG
-            printRegister(r);
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%c).\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-",
-                   r->sexoBebe
-            );
-        }
+        printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
+               r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+               strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+               strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+        );
+    } else if (r->sexoBebe == '1') {
+        printf("Nasceu em %s/%s, em %s, um bebê de sexo MASCULINO.\n",
+               r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+               strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+               strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+        );
+    } else if (r->sexoBebe == '2') {
+        printf("Nasceu em %s/%s, em %s, um bebê de sexo FEMININO.\n",
+               r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+               strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+               strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+        );
+    } else {
+        // DEBUG
+        printRegister(r);
+        printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%c).\n",
+               r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+               strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+               strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-",
+               r->sexoBebe
+        );
+    }
 }
 
 void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
@@ -277,4 +284,90 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     freeRegister(&r);
     free(rh);
     fclose(fp);
+}
+
+void Funcionalidade7(char *nomeArquivo, int n) {
+    FILE *fp = fopen(nomeArquivo, "rb+");
+
+    for (int i = 0; i < n; i++) {
+        int rrn;
+        int numberOfFieds;
+        char nomeCampo[128];
+        char valorCampo[128];
+
+        scanf("%d %d", &rrn, &numberOfFieds);
+
+        Registro *r = readRegister(fp, i);
+        printRegister(r);
+
+        for (int m = 0; m < numberOfFieds; m++) {
+            scanf("%s", nomeCampo);
+            scan_quote_string(valorCampo);
+
+            if (strcmp(nomeCampo, "cidadeMae") == 0) {
+
+                if (valorCampo[0] == '\0') {
+                    r->cidadeMae_size = 0;
+                } else {
+                    r->cidadeMae_size = strlen(valorCampo);
+                    strcpy(r->cidadeMae, valorCampo);
+                }
+            } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
+
+                if (valorCampo[0] == '\0') {
+                    r->cidadeBebe_size = 0;
+                } else {
+                    r->cidadeBebe_size = strlen(valorCampo);
+                    strcpy(r->cidadeBebe, valorCampo);
+                }
+
+            } else if (strcmp(nomeCampo, "idNascimento") == 0) {
+                r->idNascimento = strtol(valorCampo, NULL, 10);
+            } else if (strcmp(nomeCampo, "idadeMae") == 0) {
+                if (valorCampo[0] == '\0') {
+                    r->idadeMae = -1;
+                } else {
+                    r->idadeMae = strtol(valorCampo, NULL, 10);
+                }
+            } else if (strcmp(nomeCampo, "dataNascimento") == 0) {
+
+                if (valorCampo[0] == '\0') {
+                    r->dataNascimento[0] = '\0';
+                } else {
+                    strcpy(r->dataNascimento, valorCampo);
+                }
+            } else if (strcmp(nomeCampo, "sexoBebe") == 0) {
+                if (valorCampo[0] == '\0') {
+                    r->sexoBebe = '0';
+                } else {
+                    r->sexoBebe = valorCampo[0];
+                }
+            } else if (strcmp(nomeCampo, "estadoMae") == 0) {
+
+                if (valorCampo[0] == '\0') {
+                    r->estadoMae[0] = '\0';
+                } else {
+                    strcpy(r->estadoMae, valorCampo);
+                }
+            } else if (strcmp(nomeCampo, "estadoBebe") == 0) {
+                if (valorCampo[0] == '\0') {
+                    r->estadoBebe[0] = '\0';
+                } else {
+                    strcpy(r->estadoBebe, valorCampo);
+                }
+            }
+
+        }
+
+        printRegister(r);
+        updateRegister(fp, rrn, r);
+
+        free(r->cidadeMae);
+        free(r->cidadeBebe);
+        freeRegister(&r);
+    }
+
+    fclose(fp);
+
+    binarioNaTela(nomeArquivo);
 }
