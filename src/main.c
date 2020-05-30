@@ -287,7 +287,7 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
 }
 
 void Funcionalidade7(char *nomeArquivo, int n) {
-    FILE *fp = fopen(nomeArquivo, "rb+");
+    FILE *fp = fopen(nomeArquivo, "r+b");
 
     for (int i = 0; i < n; i++) {
         int rrn;
