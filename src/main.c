@@ -16,23 +16,69 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida);
 
 void Funcionalidade2(char *nomeArquivo);
 
+void Funcionalidade4(char *nomeArquivo, int rrn);
+
 int main() {
 
     int operation = 0;
+    char arquivoEntrada[100], arquivoSaida[100];
 
     scanf("%d", &operation);
 
-    if (operation == 1) {
-        char arquivoEntrada[100], arquivoSaida[100];
-        scanf("%s %s", arquivoEntrada, arquivoSaida);
-        firstOperation(arquivoEntrada, arquivoSaida);
-    } else if (operation == 2) {
-        char nomeArquivo[100];
-        scanf("%s", nomeArquivo);
-        Funcionalidade2(nomeArquivo);
+    switch (operation) { //Executa as funcionalidades conforme definidas.
+        case 1 :
+            scanf("%s %s", arquivoEntrada, arquivoSaida);
+            firstOperation(arquivoEntrada, arquivoSaida);
+            break;
+        case 2 :
+            scanf("%s", arquivoEntrada);
+            Funcionalidade2(arquivoEntrada);
+        case 3 :
+            break;
+        case 4 :
+            scanf("%s %d",arquivoEntrada, &operation); //como a variavel de operacao ja foi usada, podemos reaproveitar ela pra alocar o rrn do registro desejado.
+            Funcionalidade4(arquivoEntrada, operation);
+            break;
+        case 5 :
+            break;
+        case 6 :
+            break;
+        case 7 :
+            break;
     }
 
     return 0;
+}
+
+void PrintR(Registro *r) {
+    if (r->sexoBebe == '0') {
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+            );
+        } else if (r->sexoBebe == '1') {
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo MASCULINO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+            );
+        } else if (r->sexoBebe == '2') {
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo FEMININO.\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
+            );
+        } else {
+            // DEBUG
+            printRegister(r);
+            printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%c).\n",
+                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
+                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
+                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-",
+                   r->sexoBebe
+            );
+        }
 }
 
 void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
@@ -174,7 +220,7 @@ void Funcionalidade2(char *nomeArquivo) {
 
     //se nao houverem registros no arquivo
     if (feof(fp)) {
-        printf("Registro inexistente.");
+        printf("Registro Inexistente.");
         fclose(fp);
         return;
     }
@@ -184,40 +230,51 @@ void Funcionalidade2(char *nomeArquivo) {
 
         Registro *r = readRegister(fp, RRN - 1);
 
-        if (r->sexoBebe == '0') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo IGNORADO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else if (r->sexoBebe == '1') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo MASCULINO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else if (r->sexoBebe == '2') {
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo FEMININO.\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-"
-            );
-        } else {
-            // DEBUG
-            printRegister(r);
-            printf("Nasceu em %s/%s, em %s, um bebê de sexo INDEFINIDO (%c).\n",
-                   r->cidadeBebe_size > 0 ? r->cidadeBebe : "-",
-                   strlen(r->estadoBebe) == 0 ? "-" : r->estadoBebe,
-                   strlen(r->dataNascimento) > 0 ? r->dataNascimento : "-",
-                   r->sexoBebe
-            );
-        }
+        //imprime o registro
+        PrintR(r);
 
         if (r->cidadeMae_size > 0) free(r->cidadeMae);
         if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 
+    free(rh);
+    fclose(fp);
+}
+
+void Funcionalidade4(char *nomeArquivo, int rrn) {
+    FILE *fp = fopen(nomeArquivo, "rb");
+
+    //se houver erro na abertura do arquivo
+    if (fp == NULL) {
+        printf("Falha no processamento do arquivo.");
+        return;
+    }
+
+    RegistroHeader *rh = readRegisterHeader(fp);
+    if (rh->status != '1') {
+        printf("Falha no processamento do arquivo.");
+        free(rh);
+        return;
+    }
+
+    //se nao houverem registros no arquivo
+    if (feof(fp)) {
+        printf("Registro Inexistente.");
+        fclose(fp);
+        return;
+    }
+
+    //busca o registro de rrn desejado
+    Registro *r = readRegister(fp, rrn);
+
+    //imprime o registro
+    PrintR(r);
+
+    //libera a memoria e fecha o arquivo
+    if (r->cidadeMae_size > 0) free(r->cidadeMae);
+    if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
+    freeRegister(&r);
     free(rh);
     fclose(fp);
 }
