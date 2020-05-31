@@ -1,0 +1,8 @@
+7 data/binario10.bin 1
+21 1 cidadeMae "GUARULHOS"
+
+
+7 data/binario03.bin 3
+36 2 estadoMae "SP" estadoBebe "SP"
+520 2 cidadeBebe "ITAPEVA" dataNascimento "2017-04-08"
+1059 1 idKadeMae NULO
