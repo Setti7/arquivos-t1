@@ -513,6 +513,7 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
 
 void Funcionalidade5(char *nomeArquivo, int n){
     FILE *fp = fopen(nomeArquivo, "r+b");
+
      //se houver erro na abertura do arquivo
     if (fp == NULL) {
         printf("Falha no processamento do arquivo.");
@@ -549,11 +550,11 @@ void Funcionalidade5(char *nomeArquivo, int n){
             freeRegister(&r);
         }
         freeRegister(&rBusca);
+        RRN=0;
     }
 
     free(rh);
     fclose(fp);
-
     binarioNaTela(nomeArquivo);
 }
 
