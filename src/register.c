@@ -193,7 +193,8 @@ Registro *readRegister(FILE *fp, int RRN) {
         r->cidadeMae = calloc(1, (r->cidadeMae_size + 1) * sizeof(char));
         fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     } else {
-        r->cidadeMae = "\0";
+        // caso seja negativo (-1) o registro foi removido
+        return NULL;
     }
 
     if (r->cidadeBebe_size > 0) {

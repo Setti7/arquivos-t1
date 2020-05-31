@@ -297,7 +297,9 @@ void Funcionalidade7(char *nomeArquivo, int n) {
 
         scanf("%d %d", &rrn, &numberOfFieds);
 
-        Registro *r = readRegister(fp, i);
+        Registro *r = readRegister(fp, rrn);
+        if (r == NULL) continue;
+
         printRegister(r);
 
         for (int m = 0; m < numberOfFieds; m++) {
@@ -310,6 +312,7 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     r->cidadeMae_size = 0;
                 } else {
                     r->cidadeMae_size = strlen(valorCampo);
+                    r->cidadeMae = malloc(sizeof(char) * r->cidadeMae_size);
                     strcpy(r->cidadeMae, valorCampo);
                 }
             } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
@@ -362,8 +365,8 @@ void Funcionalidade7(char *nomeArquivo, int n) {
         printRegister(r);
         updateRegister(fp, rrn, r);
 
-        free(r->cidadeMae);
-        free(r->cidadeBebe);
+//        free(r->cidadeMae);
+//        free(r->cidadeBebe);
         freeRegister(&r);
     }
 
