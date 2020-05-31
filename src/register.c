@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "register.h"
-
+#define REGISTER_OPERATION short int
+#define REGISTER_OVERWRITE -1
+#define REGISTER_UPDATE -2
 
 Registro *initRegister() {
     /*
@@ -41,6 +43,79 @@ void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
     char t[111];
     memset(t, '$', 111);
     fwrite(&t, sizeof(char), 111, fp);
+}
+
+void internalWriteRegisterRRN(FILE *fp, Registro *r, int RRN, REGISTER_OPERATION op) {
+    /*
+     * Função interna para escrever um registro em qualquer posição de RRN.
+     *
+     * Caso REGISTER_OPERATION seja REGISTER_OVERWRITE, todos os dados do registro serão sobre escrevidos e os campos
+     * vagos serão preenchidos com lixo.
+     *
+     * Caso REGISTER_OPERATION seja REGISTER_UPDATE, os campos serão sobreescrevidos, porém, os campos de tamanho
+     * fixo não serão completados com lixo.
+     * */
+
+    // define trash
+    char t[128];
+    memset(t, '$', 128);
+
+    // Go to the RRN position
+    fseek(fp, 128 + (RRN * 128), SEEK_SET);
+
+    // Write all fields
+
+    // Write the length of dynamic fields
+    fwrite(&r->cidadeMae_size, sizeof(int), 1, fp);
+    fwrite(&r->cidadeBebe_size, sizeof(int), 1, fp);
+
+    // Write the dynamic fields
+    fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
+    fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
+
+    // skip the remaining space
+    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+
+    // idNascimento não precisa tratar pois nunca é nulo
+    fwrite(&r->idNascimento, sizeof(int), 1, fp);
+
+    // Tratamento da idadeMae
+    if (r->idadeMae <= 0) {
+        int idadeMaeInvalida = -1;
+        fwrite(&idadeMaeInvalida, sizeof(int), 1, fp);
+    } else {
+        fwrite(&r->idadeMae, sizeof(int), 1, fp);
+    }
+
+    // Tratamento da data de nascimento
+    if (strlen(r->dataNascimento) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 10, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->dataNascimento, sizeof(char), 10, fp);
+    }
+
+    fwrite(&r->sexoBebe, sizeof(char), 1, fp);
+
+    // Tratamento estadoMae
+    if (strlen(r->estadoMae) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoMae, sizeof(char), 2, fp);
+    }
+
+    // Tratamento estadoBebe
+    if (strlen(r->estadoBebe) == 0) {
+        t[0] = '\0';
+        fwrite(&t, sizeof(char), 2, fp);
+        memset(t, '$', 128);
+    } else {
+        fwrite(&r->estadoBebe, sizeof(char), 2, fp);
+    }
+
 }
 
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
@@ -131,61 +206,7 @@ void updateRegister(FILE *fp, int RRN, Registro *r) {
     rh->status = '0';
     writeHeaderRegister(fp, rh);
 
-    // Go to the RRN position
-    fseek(fp, 128 + (RRN * 128), SEEK_SET);
-
-    // Write all fields
-
-    // Write the length of dynamic fields
-    fwrite(&r->cidadeMae_size, sizeof(int), 1, fp);
-    fwrite(&r->cidadeBebe_size, sizeof(int), 1, fp);
-
-    // Write the dynamic fields
-    fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
-    fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
-
-    // skip the remaining space
-    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
-
-    // idNascimento não precisa tratar pois nunca é nulo
-    fwrite(&r->idNascimento, sizeof(int), 1, fp);
-
-    // Tratamento da idadeMae
-    if (r->idadeMae <= 0) {
-        int idadeMaeInvalida = -1;
-        fwrite(&idadeMaeInvalida, sizeof(int), 1, fp);
-    } else {
-        fwrite(&r->idadeMae, sizeof(int), 1, fp);
-    }
-
-    // Tratamento da data de nascimento
-    if (strlen(r->dataNascimento) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 10, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->dataNascimento, sizeof(char), 10, fp);
-    }
-
-    fwrite(&r->sexoBebe, sizeof(char), 1, fp);
-
-    // Tratamento estadoMae
-    if (strlen(r->estadoMae) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 2, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->estadoMae, sizeof(char), 2, fp);
-    }
-
-    // Tratamento estadoBebe
-    if (strlen(r->estadoBebe) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 2, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->estadoBebe, sizeof(char), 2, fp);
-    }
+    internalWriteRegisterRRN(fp, r, RRN, REGISTER_UPDATE);
 
     // Update the header
     rh->status = '1';
@@ -198,7 +219,6 @@ void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     /*
      * Marca o registro como removido.
      * */
-
 }
 
 Registro *readRegister(FILE *fp, int RRN) {
@@ -215,7 +235,7 @@ Registro *readRegister(FILE *fp, int RRN) {
     fread(&r->cidadeMae_size, sizeof(int), 1, fp);
     fread(&r->cidadeBebe_size, sizeof(int), 1, fp);
 
-    if (r->cidadeMae_size > 0) {
+    if (r->cidadeMae_size >= 0) {
         // tamanho alocado da string é 1 a mais para caber o \0
         r->cidadeMae = calloc(1, (r->cidadeMae_size + 1) * sizeof(char));
         fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
@@ -225,7 +245,7 @@ Registro *readRegister(FILE *fp, int RRN) {
         return NULL;
     }
 
-    if (r->cidadeBebe_size > 0) {
+    if (r->cidadeBebe_size >= 0) {
         // tamanho alocado da string é 1 a mais para caber o \0
         r->cidadeBebe = calloc(1, (r->cidadeBebe_size + 1) * sizeof(char));
         fread(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);

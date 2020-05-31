@@ -240,8 +240,8 @@ void Funcionalidade2(char *nomeArquivo) {
         //imprime o registro
         PrintR(r);
 
-        if (r->cidadeMae_size > 0) free(r->cidadeMae);
-        if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
+        if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+        if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 
@@ -279,8 +279,8 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     PrintR(r);
 
     //libera a memoria e fecha o arquivo
-    if (r->cidadeMae_size > 0) free(r->cidadeMae);
-    if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
+    if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+    if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
     freeRegister(&r);
     free(rh);
     fclose(fp);
@@ -297,14 +297,19 @@ void Funcionalidade7(char *nomeArquivo, int n) {
 
         scanf("%d %d", &rrn, &numberOfFieds);
 
+        // le o registro no dado rrn, caso volte nulo ele foi removido.
         Registro *r = readRegister(fp, rrn);
         if (r == NULL) continue;
+
+        // DBEUG
+        // printRegister(r);
 
         for (int m = 0; m < numberOfFieds; m++) {
             scanf("%s", nomeCampo);
             scan_quote_string(valorCampo);
 
             if (strcmp(nomeCampo, "cidadeMae") == 0) {
+                //se o campo for cidadeMae
 
                 if (valorCampo[0] == '\0') {
                     r->cidadeMae_size = 0;
@@ -314,6 +319,7 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     strcpy(r->cidadeMae, valorCampo);
                 }
             } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
+                // se o campo for cidadeBebe
 
                 if (valorCampo[0] == '\0') {
                     r->cidadeBebe_size = 0;
@@ -323,14 +329,17 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                 }
 
             } else if (strcmp(nomeCampo, "idNascimento") == 0) {
+                // se o campo for idNascimento, apenas atualize seu valor (não precisa tratar)
                 r->idNascimento = strtol(valorCampo, NULL, 10);
             } else if (strcmp(nomeCampo, "idadeMae") == 0) {
+                // idade mae precisa tratar valores nulos com -1
                 if (valorCampo[0] == '\0') {
                     r->idadeMae = -1;
                 } else {
                     r->idadeMae = strtol(valorCampo, NULL, 10);
                 }
             } else if (strcmp(nomeCampo, "dataNascimento") == 0) {
+                // dataNascimento precisa tratar valores nulos
 
                 if (valorCampo[0] == '\0') {
                     r->dataNascimento[0] = '\0';
@@ -338,12 +347,15 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     strcpy(r->dataNascimento, valorCampo);
                 }
             } else if (strcmp(nomeCampo, "sexoBebe") == 0) {
+                // sexoBebe precisa tratar valores nulos
+
                 if (valorCampo[0] == '\0') {
                     r->sexoBebe = '0';
                 } else {
                     r->sexoBebe = valorCampo[0];
                 }
             } else if (strcmp(nomeCampo, "estadoMae") == 0) {
+                // estadoMae precisa tratar valores nulos
 
                 if (valorCampo[0] == '\0') {
                     r->estadoMae[0] = '\0';
@@ -351,6 +363,8 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     strcpy(r->estadoMae, valorCampo);
                 }
             } else if (strcmp(nomeCampo, "estadoBebe") == 0) {
+                // estadoBebe precisa tratar valores nulos
+
                 if (valorCampo[0] == '\0') {
                     r->estadoBebe[0] = '\0';
                 } else {
@@ -360,10 +374,11 @@ void Funcionalidade7(char *nomeArquivo, int n) {
 
         }
 
+//        printRegister(r);
         updateRegister(fp, rrn, r);
 
-        if (r->cidadeMae_size > 0) free(r->cidadeMae);
-        if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
+        if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+        if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 
