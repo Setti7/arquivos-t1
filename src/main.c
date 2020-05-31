@@ -92,6 +92,11 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida) {
     FILE *fp = fopen(arquivoEntrada, "r");
     FILE *out = fopen(arquivoSaida, "wb");
 
+    if (fp == NULL || out == NULL) {
+        printf("Falha no carregamento do arquivo.");
+        return;
+    }
+
     char line[1024];
     int c = 0;
 
@@ -227,7 +232,15 @@ void Funcionalidade2(char *nomeArquivo) {
 
     //se nao houverem registros no arquivo
     if (feof(fp)) {
-        printf("Registro Inexistente.");
+        printf("Registro inexistente.");
+        free(rh);
+        fclose(fp);
+        return;
+    }
+
+    if (rh->RRNproxRegistro == 0) {
+        printf("Registro inexistente.");
+        free(rh);
         fclose(fp);
         return;
     }

@@ -1,5 +1,5 @@
 all: clear dir register binarioNaTela main
-	gcc -g build/register.o build/binarioNaTela.o build/main.o -o main -Wall -lm
+	gcc -g build/register.o build/binarioNaTela.o build/main.o -o build/main -Wall -lm
 
 dir:
 	mkdir build/
@@ -17,7 +17,7 @@ clear:
 	rm -rf build/
 
 run:
-	./main
+	./build/main
 
 debug: clear register binarioNaTela main
 	gcc -g build/register.o build/binarioNaTela.o build/main.o -o main -Wall -lm -fsanitize=address
