@@ -300,8 +300,6 @@ void Funcionalidade7(char *nomeArquivo, int n) {
         Registro *r = readRegister(fp, rrn);
         if (r == NULL) continue;
 
-        printRegister(r);
-
         for (int m = 0; m < numberOfFieds; m++) {
             scanf("%s", nomeCampo);
             scan_quote_string(valorCampo);
@@ -362,11 +360,10 @@ void Funcionalidade7(char *nomeArquivo, int n) {
 
         }
 
-        printRegister(r);
         updateRegister(fp, rrn, r);
 
-//        free(r->cidadeMae);
-//        free(r->cidadeBebe);
+        if (r->cidadeMae_size > 0) free(r->cidadeMae);
+        if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 

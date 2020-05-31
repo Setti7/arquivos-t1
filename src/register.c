@@ -172,6 +172,7 @@ void updateRegister(FILE *fp, int RRN, Registro *r) {
 
     // Update the header
     rh->status = '1';
+    rh->numeroRegistrosAtualizados++;
     writeHeaderRegister(fp, rh);
     free(rh);
 }
@@ -194,6 +195,7 @@ Registro *readRegister(FILE *fp, int RRN) {
         fread(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     } else {
         // caso seja negativo (-1) o registro foi removido
+        free(r);
         return NULL;
     }
 
