@@ -33,7 +33,7 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh);
 
 void updateRegister(FILE *fp, int RRN, Registro *r);
 
-void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh);
+void deleteRegister(FILE *fp, int RRN, RegistroHeader *rh);
 
 Registro *readRegister(FILE *fp, int RRN);
 

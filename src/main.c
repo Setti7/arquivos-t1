@@ -20,7 +20,7 @@ void Funcionalidade3(char *nomeArquivo, int m);
 
 void Funcionalidade4(char *nomeArquivo, int rrn);
 
-void Funcionalidade5(char *nomeArquivo, int m);
+void Funcionalidade5(char *nomeArquivo, int n);
 
 void Funcionalidade7(char *nomeArquivo, int n);
 
@@ -49,6 +49,8 @@ int main() {
             Funcionalidade4(arquivoEntrada, operation);
             break;
         case 5 :
+            scanf("%s %d", arquivoEntrada, &operation);
+            Funcionalidade5(arquivoEntrada, operation);
             break;
         case 6 :
             break;
@@ -63,59 +65,59 @@ int main() {
     return 0;
 }
 
-int ComparaCamposNaoNulos(Registro *r1, Registro *r2) {
+int ComparaCamposNaoNulos(Registro *r, Registro *rBusca) {
     int igual = 0;
-    if(r1->cidadeBebe!=NULL && r2->cidadeBebe!=NULL){
-        if (strcmp(r1->cidadeBebe,r2->cidadeBebe)==0) {
+    if(rBusca->cidadeBebe!=NULL){
+        if (strcmp(r->cidadeBebe,rBusca->cidadeBebe)==0) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(r1->cidadeMae!=NULL && r2->cidadeMae!=NULL){
-        if (strcmp(r1->cidadeMae,r2->cidadeMae)==0) {
+    if(rBusca->cidadeMae!=NULL){
+        if (strcmp(r->cidadeMae,rBusca->cidadeMae)==0) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(strcmp(r1->estadoBebe,"\0")!=0 && strcmp(r2->estadoBebe,"\0")!=0){
-        if (strcmp(r1->estadoBebe,r2->estadoBebe)==0) {
+    if(strcmp(rBusca->estadoBebe,"\0")!=0){
+        if (strcmp(r->estadoBebe,rBusca->estadoBebe)==0) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(strcmp(r1->estadoMae,"\0")!=0 && strcmp(r2->estadoMae,"\0")!=0){
-        if (strcmp(r1->estadoMae,r2->estadoMae)==0) {
+    if(strcmp(rBusca->estadoMae,"\0")!=0){
+        if (strcmp(r->estadoMae,rBusca->estadoMae)==0) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(strcmp(r1->dataNascimento,"\0")!=0 && strcmp(r2->dataNascimento,"\0")!=0){
-        if (strcmp(r1->dataNascimento,r2->dataNascimento)==0) {
+    if(strcmp(rBusca->dataNascimento,"\0")!=0){
+        if (strcmp(r->dataNascimento,rBusca->dataNascimento)==0) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(r1->idNascimento!=0 && r2->idNascimento!=0){
-        if (r1->idNascimento==r2->idNascimento) {
+    if(rBusca->idNascimento!=0){
+        if (r->idNascimento==rBusca->idNascimento) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(r1->sexoBebe!='\0' && r2->sexoBebe!='\0'){
-        if (r1->sexoBebe==r2->sexoBebe) {
+    if(rBusca->sexoBebe!='\0'){
+        if (r->sexoBebe==rBusca->sexoBebe) {
             igual = 1;
         }
         else
             return 0;
     }
-    if(r1->idadeMae!=0 && r2->idadeMae!=0){
-        if (r1->idadeMae==r2->idadeMae) {
+    if(rBusca->idadeMae!=0){
+        if (r->idadeMae==rBusca->idadeMae) {
             igual = 1;
         }
         else
@@ -149,6 +151,7 @@ Registro *MontarCampos(int numberOfFieds) {
                 r->cidadeBebe_size = 0;
             } else {
                 r->cidadeBebe_size = strlen(valorCampo);
+                r->cidadeBebe = malloc(sizeof(char) * r->cidadeBebe_size);
                 strcpy(r->cidadeBebe, valorCampo);
             }
 
@@ -411,7 +414,7 @@ void Funcionalidade2(char *nomeArquivo) {
 
 void Funcionalidade3(char *nomeArquivo, int m) {
     FILE *fp = fopen(nomeArquivo, "rb");
-
+    int imprimiu =0;
     //se houver erro na abertura do arquivo
     if (fp == NULL) {
         printf("Falha no processamento do arquivo.");
@@ -454,12 +457,15 @@ void Funcionalidade3(char *nomeArquivo, int m) {
             continue;
         //imprime o registro
         PrintR(r);
-
+        imprimiu++;
         if (r->cidadeMae_size >= 0) free(r->cidadeMae);
         if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
-
+    freeRegister(&rBusca);
+    if(imprimiu==0){
+        printf("Registro Inexistente.");
+    }
 }
 
 void Funcionalidade4(char *nomeArquivo, int rrn) {
@@ -505,7 +511,51 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     fclose(fp);
 }
 
+void Funcionalidade5(char *nomeArquivo, int n){
+    FILE *fp = fopen(nomeArquivo, "r+b");
+     //se houver erro na abertura do arquivo
+    if (fp == NULL) {
+        printf("Falha no processamento do arquivo.");
+        return;
+    }
 
+    RegistroHeader *rh = readRegisterHeader(fp);
+    int RRN = 0;
+    if (rh->status != '1') {
+        printf("Falha no processamento do arquivo.");
+        free(rh);
+        fclose(fp);
+        return;
+    }
+    for(int i = 0; i < n; i++){
+        int m = 0;
+        scanf("%d", &m);
+        Registro *rBusca = MontarCampos(m);
+        while (RRN != rh->RRNproxRegistro) {
+            RRN++;
+
+            Registro *r = readRegister(fp, RRN - 1);
+
+            if(r==NULL)
+                continue;
+
+            if(ComparaCamposNaoNulos(r,rBusca)==0)
+                continue;
+            //remove registro
+            deleteRegister(fp, RRN-1, rh);
+
+            if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+            if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
+            freeRegister(&r);
+        }
+        freeRegister(&rBusca);
+    }
+
+    free(rh);
+    fclose(fp);
+
+    binarioNaTela(nomeArquivo);
+}
 
 void Funcionalidade7(char *nomeArquivo, int n) {
     FILE *fp = fopen(nomeArquivo, "r+b");
@@ -546,6 +596,7 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     r->cidadeBebe_size = 0;
                 } else {
                     r->cidadeBebe_size = strlen(valorCampo);
+                    r->cidadeBebe = malloc(sizeof(char) * r->cidadeBebe_size);
                     strcpy(r->cidadeBebe, valorCampo);
                 }
 
