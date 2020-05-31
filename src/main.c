@@ -16,7 +16,11 @@ void firstOperation(char *arquivoEntrada, char *arquivoSaida);
 
 void Funcionalidade2(char *nomeArquivo);
 
+void Funcionalidade3(char *nomeArquivo, int m);
+
 void Funcionalidade4(char *nomeArquivo, int rrn);
+
+void Funcionalidade5(char *nomeArquivo, int m);
 
 void Funcionalidade7(char *nomeArquivo, int n);
 
@@ -36,6 +40,8 @@ int main() {
             scanf("%s", arquivoEntrada);
             Funcionalidade2(arquivoEntrada);
         case 3 :
+            scanf("%s %d", arquivoEntrada, &operation);
+            Funcionalidade3(arquivoEntrada, operation);
             break;
         case 4 :
             scanf("%s %d", arquivoEntrada,
@@ -55,6 +61,144 @@ int main() {
     }
 
     return 0;
+}
+
+int ComparaCamposNaoNulos(Registro *r1, Registro *r2) {
+    int igual = 0;
+    if(r1->cidadeBebe!=NULL && r2->cidadeBebe!=NULL){
+        if (strcmp(r1->cidadeBebe,r2->cidadeBebe)==0) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(r1->cidadeMae!=NULL && r2->cidadeMae!=NULL){
+        if (strcmp(r1->cidadeMae,r2->cidadeMae)==0) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(strcmp(r1->estadoBebe,"\0")!=0 && strcmp(r2->estadoBebe,"\0")!=0){
+        if (strcmp(r1->estadoBebe,r2->estadoBebe)==0) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(strcmp(r1->estadoMae,"\0")!=0 && strcmp(r2->estadoMae,"\0")!=0){
+        if (strcmp(r1->estadoMae,r2->estadoMae)==0) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(strcmp(r1->dataNascimento,"\0")!=0 && strcmp(r2->dataNascimento,"\0")!=0){
+        if (strcmp(r1->dataNascimento,r2->dataNascimento)==0) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(r1->idNascimento!=0 && r2->idNascimento!=0){
+        if (r1->idNascimento==r2->idNascimento) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(r1->sexoBebe!='\0' && r2->sexoBebe!='\0'){
+        if (r1->sexoBebe==r2->sexoBebe) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    if(r1->idadeMae!=0 && r2->idadeMae!=0){
+        if (r1->idadeMae==r2->idadeMae) {
+            igual = 1;
+        }
+        else
+            return 0;
+    }
+    return igual;
+}
+
+Registro *MontarCampos(int numberOfFieds) {
+    Registro *r = initRegister();
+    char nomeCampo[128];
+    char valorCampo[128];
+    for (int m = 0; m < numberOfFieds; m++) {
+        scanf("%s", nomeCampo);
+        scan_quote_string(valorCampo);
+
+        if (strcmp(nomeCampo, "cidadeMae") == 0) {
+            //se o campo for cidadeMae
+
+            if (valorCampo[0] == '\0') {
+                r->cidadeMae_size = 0;
+            } else {
+                r->cidadeMae_size = strlen(valorCampo);
+                r->cidadeMae = malloc(sizeof(char) * r->cidadeMae_size);
+                strcpy(r->cidadeMae, valorCampo);
+            }
+        } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
+            // se o campo for cidadeBebe
+
+            if (valorCampo[0] == '\0') {
+                r->cidadeBebe_size = 0;
+            } else {
+                r->cidadeBebe_size = strlen(valorCampo);
+                strcpy(r->cidadeBebe, valorCampo);
+            }
+
+        } else if (strcmp(nomeCampo, "idNascimento") == 0) {
+            // se o campo for idNascimento, apenas atualize seu valor (não precisa tratar)
+            r->idNascimento = strtol(valorCampo, NULL, 10);
+        } else if (strcmp(nomeCampo, "idadeMae") == 0) {
+            // idade mae precisa tratar valores nulos com -1
+            if (valorCampo[0] == '\0') {
+                r->idadeMae = -1;
+            } else {
+                r->idadeMae = strtol(valorCampo, NULL, 10);
+            }
+        } else if (strcmp(nomeCampo, "dataNascimento") == 0) {
+            // dataNascimento precisa tratar valores nulos
+
+            if (valorCampo[0] == '\0') {
+                r->dataNascimento[0] = '\0';
+            } else {
+                strcpy(r->dataNascimento, valorCampo);
+            }
+        } else if (strcmp(nomeCampo, "sexoBebe") == 0) {
+            // sexoBebe precisa tratar valores nulos
+
+            if (valorCampo[0] == '\0') {
+                r->sexoBebe = '0';
+            } else {
+                r->sexoBebe = valorCampo[0];
+            }
+        } else if (strcmp(nomeCampo, "estadoMae") == 0) {
+            // estadoMae precisa tratar valores nulos
+
+            if (valorCampo[0] == '\0') {
+                r->estadoMae[0] = '\0';
+            } else {
+                strcpy(r->estadoMae, valorCampo);
+            }
+        } else if (strcmp(nomeCampo, "estadoBebe") == 0) {
+            // estadoBebe precisa tratar valores nulos
+
+            if (valorCampo[0] == '\0') {
+                r->estadoBebe[0] = '\0';
+            } else {
+                strcpy(r->estadoBebe, valorCampo);
+            }
+        }
+
+    }
+
+    return r;
 }
 
 void PrintR(Registro *r) {
@@ -227,19 +371,20 @@ void Funcionalidade2(char *nomeArquivo) {
     if (rh->status != '1') {
         printf("Falha no processamento do arquivo.");
         free(rh);
+        fclose(fp);
         return;
     }
 
     //se nao houverem registros no arquivo
     if (feof(fp)) {
-        printf("Registro inexistente.");
+        printf("Registro Inexistente.");
         free(rh);
         fclose(fp);
         return;
     }
 
     if (rh->RRNproxRegistro == 0) {
-        printf("Registro inexistente.");
+        printf("Registro Inexistente.");
         free(rh);
         fclose(fp);
         return;
@@ -250,6 +395,8 @@ void Funcionalidade2(char *nomeArquivo) {
 
         Registro *r = readRegister(fp, RRN - 1);
 
+        if(r==NULL)
+            continue;
         //imprime o registro
         PrintR(r);
 
@@ -260,6 +407,59 @@ void Funcionalidade2(char *nomeArquivo) {
 
     free(rh);
     fclose(fp);
+}
+
+void Funcionalidade3(char *nomeArquivo, int m) {
+    FILE *fp = fopen(nomeArquivo, "rb");
+
+    //se houver erro na abertura do arquivo
+    if (fp == NULL) {
+        printf("Falha no processamento do arquivo.");
+        return;
+    }
+    int RRN = 0;
+    RegistroHeader *rh = readRegisterHeader(fp);
+    if (rh->status != '1') {
+        printf("Falha no processamento do arquivo.");
+        free(rh);
+        fclose(fp);
+        return;
+    }
+
+    //se nao houverem registros no arquivo
+    if (feof(fp)) {
+        printf("Registro Inexistente.");
+        free(rh);
+        fclose(fp);
+        return;
+    }
+    Registro *rBusca = MontarCampos(m);
+
+    if (rh->RRNproxRegistro == 0) {
+        printf("Registro Inexistente.");
+        free(rh);
+        fclose(fp);
+        return;
+    }
+
+    while (RRN != rh->RRNproxRegistro) {
+        RRN++;
+
+        Registro *r = readRegister(fp, RRN - 1);
+
+        if(r==NULL)
+            continue;
+
+        if(ComparaCamposNaoNulos(r,rBusca)==0)
+            continue;
+        //imprime o registro
+        PrintR(r);
+
+        if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+        if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
+        freeRegister(&r);
+    }
+
 }
 
 void Funcionalidade4(char *nomeArquivo, int rrn) {
@@ -275,6 +475,7 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     if (rh->status != '1') {
         printf("Falha no processamento do arquivo.");
         free(rh);
+        fclose(fp);
         return;
     }
 
@@ -288,6 +489,11 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     //busca o registro de rrn desejado
     Registro *r = readRegister(fp, rrn);
 
+    if(r==NULL) { //se o registro foi removido;
+        printf("Registro Inexistente.");
+        return;
+    }
+
     //imprime o registro
     PrintR(r);
 
@@ -298,6 +504,8 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     free(rh);
     fclose(fp);
 }
+
+
 
 void Funcionalidade7(char *nomeArquivo, int n) {
     FILE *fp = fopen(nomeArquivo, "r+b");
