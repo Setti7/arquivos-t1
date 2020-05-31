@@ -5,16 +5,29 @@
 
 
 Registro *initRegister() {
+    /*
+     * Inicializa um registro. Caso use os campos de tamaho variavél, eles devem ser alocados individualmente (e free'd
+     * também).
+     * */
+
     return calloc(1, sizeof(Registro));
 }
 
 RegistroHeader *initRegisterHeader() {
+    /*
+     * Inicializa um registro de cabeçalho.
+     * */
+
     RegistroHeader *rh = calloc(1, sizeof(RegistroHeader));
     rh->status = '1';
     return rh;
 }
 
 void writeHeaderRegister(FILE *fp, RegistroHeader *rh) {
+    /*
+     * Escreve o registro de cabeçalho no arquivo.
+     * */
+
     fseek(fp, 0, SEEK_SET);
 
     fwrite(&rh->status, sizeof(char), 1, fp);
@@ -105,6 +118,10 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 }
 
 void updateRegister(FILE *fp, int RRN, Registro *r) {
+    /*
+     * Atualiza o registro em RRN.
+     * */
+
     // trash
     char t[128];
     memset(t, '$', 128);
@@ -177,9 +194,18 @@ void updateRegister(FILE *fp, int RRN, Registro *r) {
     free(rh);
 }
 
-void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {}
+void deleteRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
+    /*
+     * Marca o registro como removido.
+     * */
+
+}
 
 Registro *readRegister(FILE *fp, int RRN) {
+    /*
+     * Retorna o registro no RRN especificado ou NULL, caso o registro tenha sido removido.
+     * */
+
     // Go to the next RRN position
     fseek(fp, 128 + (RRN * 128), SEEK_SET);
     Registro *r = initRegister();
@@ -222,6 +248,10 @@ Registro *readRegister(FILE *fp, int RRN) {
 }
 
 RegistroHeader *readRegisterHeader(FILE *fp) {
+    /*
+     * Retorna o registro de cabeçalho do arquivo.
+     * */
+
     fseek(fp, 0, SEEK_SET);
 
     RegistroHeader *rh = initRegisterHeader();
@@ -236,12 +266,21 @@ RegistroHeader *readRegisterHeader(FILE *fp) {
 }
 
 void printRegister(Registro *r) {
+    /*
+     * Printa o registro para stderr para debugar.
+     * */
+
     fprintf(stderr, "Registro: %s (%d) | %s (%d) | %d | %d | %s | %c | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
             r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
             r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
 }
 
 void freeRegister(Registro **r) {
+    /*
+     * Free no registro, porém ainda é necessário dar free individualmente nos campos de tamanho variavel se eles foram
+     * usados.
+     * */
+
     free(*r);
     *r = NULL;
 }
