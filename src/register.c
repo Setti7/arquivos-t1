@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "register.h"
+
 #define REGISTER_OPERATION short int
 #define REGISTER_OVERWRITE -1
 #define REGISTER_UPDATE -2
@@ -73,8 +74,11 @@ void internalWriteRegisterRRN(FILE *fp, Registro *r, int RRN, REGISTER_OPERATION
     fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
     fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
 
-    // skip the remaining space
-    fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+    // skip the remaining space or fill it with trash depending on the operation
+    if (op == REGISTER_UPDATE)
+        fseek(fp, 97 - r->cidadeBebe_size - r->cidadeMae_size, SEEK_CUR);
+    else if (op == REGISTER_OVERWRITE)
+        fwrite(&t, sizeof(char), 97 - r->cidadeBebe_size - r->cidadeMae_size, fp);
 
     // idNascimento não precisa tratar pois nunca é nulo
     fwrite(&r->idNascimento, sizeof(int), 1, fp);
@@ -119,10 +123,9 @@ void internalWriteRegisterRRN(FILE *fp, Registro *r, int RRN, REGISTER_OPERATION
 }
 
 void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
-
-    // trash
-    char t[128];
-    memset(t, '$', 128);
+    /*
+     * Adiciona um registro no final do arquivo.
+     * */
 
     // Set the register status to 0 (busy)
     rh->status = '0';
@@ -130,60 +133,8 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
 
     // Go to the next RRN position
     int RRN = rh->RRNproxRegistro;
-    fseek(fp, 128 + (RRN * 128), SEEK_SET);
 
-    // Write all fields
-
-    // Write the length of dynamic fields
-    fwrite(&r->cidadeMae_size, sizeof(int), 1, fp);
-    fwrite(&r->cidadeBebe_size, sizeof(int), 1, fp);
-
-    // Write the dynamic fields
-    fwrite(r->cidadeMae, sizeof(char), r->cidadeMae_size, fp);
-    fwrite(r->cidadeBebe, sizeof(char), r->cidadeBebe_size, fp);
-
-    // fill the remaining space with trash
-    fwrite(&t, sizeof(char), 97 - r->cidadeBebe_size - r->cidadeMae_size, fp);
-
-    // idNascimento não precisa tratar pois nunca é nulo
-    fwrite(&r->idNascimento, sizeof(int), 1, fp);
-
-    // Tratamento da idadeMae
-    if (r->idadeMae <= 0) {
-        int idadeMaeInvalida = -1;
-        fwrite(&idadeMaeInvalida, sizeof(int), 1, fp);
-    } else {
-        fwrite(&r->idadeMae, sizeof(int), 1, fp);
-    }
-
-    // Tratamento da data de nascimento
-    if (strlen(r->dataNascimento) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 10, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->dataNascimento, sizeof(char), 10, fp);
-    }
-
-    fwrite(&r->sexoBebe, sizeof(char), 1, fp);
-
-    // Tratamento estadoMae
-    if (strlen(r->estadoMae) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 2, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->estadoMae, sizeof(char), 2, fp);
-    }
-
-    // Tratamento estadoBebe
-    if (strlen(r->estadoBebe) == 0) {
-        t[0] = '\0';
-        fwrite(&t, sizeof(char), 2, fp);
-        memset(t, '$', 128);
-    } else {
-        fwrite(&r->estadoBebe, sizeof(char), 2, fp);
-    }
+    internalWriteRegisterRRN(fp, r, RRN, REGISTER_OVERWRITE);
 
     // Update the header
     rh->status = '1';
@@ -196,10 +147,6 @@ void updateRegister(FILE *fp, int RRN, Registro *r) {
     /*
      * Atualiza o registro em RRN.
      * */
-
-    // trash
-    char t[128];
-    memset(t, '$', 128);
 
     // Set the register status to 0 (busy)
     RegistroHeader *rh = readRegisterHeader(fp);
