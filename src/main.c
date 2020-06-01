@@ -24,6 +24,8 @@ void Funcionalidade5(char *nomeArquivo, int n);
 
 void Funcionalidade7(char *nomeArquivo, int n);
 
+void Funcionalidade6(char *nomeArquivo, int n);
+
 int main() {
 
     int operation = 0;
@@ -52,8 +54,12 @@ int main() {
             scanf("%s %d", arquivoEntrada, &operation);
             Funcionalidade5(arquivoEntrada, operation);
             break;
-        case 6 :
+        case 6 : {
+            int n = 0;
+            scanf("%s %d", arquivoEntrada, &n);
+            Funcionalidade6(arquivoEntrada, n);
             break;
+        }
         case 7 : {
             int n = 0;
             scanf("%s %d", arquivoEntrada, &n);
@@ -549,6 +555,106 @@ void Funcionalidade5(char *nomeArquivo, int n) {
     fclose(fp);
     binarioNaTela(nomeArquivo);
 }
+
+
+void Funcionalidade6(char *nomeArquivo, int n) {
+    FILE *fp = fopen(nomeArquivo, "r+b");
+
+    if (fp == NULL) {
+        printf("Falha no processamento do arquivo.");
+        return;
+    }
+
+    // le o registro de cabeçalho para verificar o arquivo está em status disponível
+    RegistroHeader *rh = readRegisterHeader(fp);
+//    printHeaderRegister(rh);
+
+    if (rh->status == '0') {
+        printf("Falha no processamento do arquivo.");
+        free(rh);
+        return;
+    }
+
+    Registro *r = initRegister();
+    char campo[128];
+
+    for (int i = 0; i < n; i++) {
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->cidadeMae_size = 0;
+        } else {
+            r->cidadeMae_size = strlen(campo);
+
+            // realloc para ocupar o novo espaço da cidade (size + 1, pois tem que haver espaço para o \0)
+            r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
+            strcpy(r->cidadeMae, campo);
+        }
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->cidadeBebe_size = 0;
+        } else {
+            r->cidadeBebe_size = strlen(campo);
+
+            // realloc para ocupar o novo espaço da cidade (size + 1, pois tem que haver espaço para o \0)
+            r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
+            strcpy(r->cidadeBebe, campo);
+        }
+
+        int idNascimento;
+        scanf("%d", &idNascimento);
+        r->idNascimento = idNascimento;
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->idadeMae = -1;
+        } else {
+            r->idadeMae = strtol(campo, NULL, 10);
+        }
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->dataNascimento[0] = '\0';
+        } else {
+            strcpy(r->dataNascimento, campo);
+        }
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->sexoBebe = '0';
+        } else {
+            r->sexoBebe = campo[0];
+        }
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->estadoMae[0] = '\0';
+        } else {
+            strcpy(r->estadoMae, campo);
+        }
+
+        scan_quote_string(campo);
+        if (campo[0] == '\0') {
+            r->estadoBebe[0] = '\0';
+        } else {
+            strcpy(r->estadoBebe, campo);
+        }
+
+        insertRegister(fp, r, rh);
+//        printHeaderRegister(rh);
+//        printRegister(r);
+    }
+
+    if (r->cidadeMae_size >= 0) free(r->cidadeMae);
+    if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
+    freeRegister(&r);
+
+    free(rh);
+    fclose(fp);
+
+    binarioNaTela(nomeArquivo);
+}
+
 
 void Funcionalidade7(char *nomeArquivo, int n) {
     FILE *fp = fopen(nomeArquivo, "r+b");

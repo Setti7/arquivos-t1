@@ -160,6 +160,27 @@ void updateRegister(FILE *fp, int RRN, Registro *r, RegistroHeader *rh) {
     writeHeaderRegister(fp, rh);
 }
 
+void insertRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
+    /*
+     * Insere um registro novo.
+     * */
+
+    // Set the register status to 0 (busy)
+    rh->status = '0';
+    writeHeaderRegister(fp, rh);
+
+    // Go to the next RRN position
+    int RRN = rh->RRNproxRegistro;
+
+    internalWriteRegisterRRN(fp, r, RRN, REGISTER_OVERWRITE);
+
+    // Update the header
+    rh->status = '1';
+    rh->RRNproxRegistro++;
+    rh->numeroRegistrosInseridos++;
+    writeHeaderRegister(fp, rh);
+}
+
 void deleteRegister(FILE *fp, int RRN, RegistroHeader *rh) {
     /*
      * Marca o registro como removido.
@@ -276,6 +297,16 @@ void printRegister(Registro *r) {
     fprintf(stderr, "Registro: %s (%d) | %s (%d) | %d | %d | %s | %c | %s | %s |\n", r->cidadeMae, r->cidadeMae_size,
             r->cidadeBebe, r->cidadeBebe_size, r->idNascimento, r->idadeMae,
             r->dataNascimento, r->sexoBebe, r->estadoMae, r->estadoBebe);
+}
+
+void printHeaderRegister(RegistroHeader *rh) {
+    /*
+     * Printa o registro de cabeçalho para stderr para debugar.
+     * */
+
+    fprintf(stderr, "Registro de cabeçalho: %c | Próximo RRN: %d | Inserido: %d | Removidos: %d | Atualizados: %d |\n",
+            rh->status, rh->RRNproxRegistro, rh->numeroRegistrosInseridos, rh->numeroRegistrosRemovidos,
+            rh->numeroRegistrosAtualizados);
 }
 
 void freeRegister(Registro **r) {
