@@ -593,7 +593,9 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     r->cidadeMae_size = 0;
                 } else {
                     r->cidadeMae_size = strlen(valorCampo);
-                    r->cidadeMae = malloc(sizeof(char) * r->cidadeMae_size);
+
+                    // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+                    r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
                     strcpy(r->cidadeMae, valorCampo);
                 }
             } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
@@ -603,7 +605,9 @@ void Funcionalidade7(char *nomeArquivo, int n) {
                     r->cidadeBebe_size = 0;
                 } else {
                     r->cidadeBebe_size = strlen(valorCampo);
-                    r->cidadeBebe = malloc(sizeof(char) * r->cidadeBebe_size);
+
+                    // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+                    r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
                     strcpy(r->cidadeBebe, valorCampo);
                 }
 
