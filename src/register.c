@@ -143,13 +143,12 @@ void addRegister(FILE *fp, Registro *r, RegistroHeader *rh) {
     writeHeaderRegister(fp, rh);
 }
 
-void updateRegister(FILE *fp, int RRN, Registro *r) {
+void updateRegister(FILE *fp, int RRN, Registro *r, RegistroHeader *rh) {
     /*
      * Atualiza o registro em RRN.
      * */
 
     // Set the register status to 0 (busy)
-    RegistroHeader *rh = readRegisterHeader(fp);
     rh->status = '0';
     writeHeaderRegister(fp, rh);
 
@@ -159,7 +158,6 @@ void updateRegister(FILE *fp, int RRN, Registro *r) {
     rh->status = '1';
     rh->numeroRegistrosAtualizados++;
     writeHeaderRegister(fp, rh);
-    free(rh);
 }
 
 void deleteRegister(FILE *fp, int RRN, RegistroHeader *rh) {

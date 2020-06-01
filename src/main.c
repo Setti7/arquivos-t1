@@ -67,60 +67,52 @@ int main() {
 
 int ComparaCamposNaoNulos(Registro *r, Registro *rBusca) {
     int igual = 0;
-    if(rBusca->cidadeBebe!=NULL){
-        if (strcmp(r->cidadeBebe,rBusca->cidadeBebe)==0) {
+    if (rBusca->cidadeBebe != NULL) {
+        if (strcmp(r->cidadeBebe, rBusca->cidadeBebe) == 0) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(rBusca->cidadeMae!=NULL){
-        if (strcmp(r->cidadeMae,rBusca->cidadeMae)==0) {
+    if (rBusca->cidadeMae != NULL) {
+        if (strcmp(r->cidadeMae, rBusca->cidadeMae) == 0) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(strcmp(rBusca->estadoBebe,"\0")!=0){
-        if (strcmp(r->estadoBebe,rBusca->estadoBebe)==0) {
+    if (strcmp(rBusca->estadoBebe, "\0") != 0) {
+        if (strcmp(r->estadoBebe, rBusca->estadoBebe) == 0) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(strcmp(rBusca->estadoMae,"\0")!=0){
-        if (strcmp(r->estadoMae,rBusca->estadoMae)==0) {
+    if (strcmp(rBusca->estadoMae, "\0") != 0) {
+        if (strcmp(r->estadoMae, rBusca->estadoMae) == 0) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(strcmp(rBusca->dataNascimento,"\0")!=0){
-        if (strcmp(r->dataNascimento,rBusca->dataNascimento)==0) {
+    if (strcmp(rBusca->dataNascimento, "\0") != 0) {
+        if (strcmp(r->dataNascimento, rBusca->dataNascimento) == 0) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(rBusca->idNascimento!=0){
-        if (r->idNascimento==rBusca->idNascimento) {
+    if (rBusca->idNascimento != 0) {
+        if (r->idNascimento == rBusca->idNascimento) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(rBusca->sexoBebe!='\0'){
-        if (r->sexoBebe==rBusca->sexoBebe) {
+    if (rBusca->sexoBebe != '\0') {
+        if (r->sexoBebe == rBusca->sexoBebe) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
-    if(rBusca->idadeMae!=0){
-        if (r->idadeMae==rBusca->idadeMae) {
+    if (rBusca->idadeMae != 0) {
+        if (r->idadeMae == rBusca->idadeMae) {
             igual = 1;
-        }
-        else
+        } else
             return 0;
     }
     return igual;
@@ -398,7 +390,7 @@ void Funcionalidade2(char *nomeArquivo) {
 
         Registro *r = readRegister(fp, RRN - 1);
 
-        if(r==NULL)
+        if (r == NULL)
             continue;
         //imprime o registro
         PrintR(r);
@@ -414,7 +406,7 @@ void Funcionalidade2(char *nomeArquivo) {
 
 void Funcionalidade3(char *nomeArquivo, int m) {
     FILE *fp = fopen(nomeArquivo, "rb");
-    int imprimiu =0;
+    int imprimiu = 0;
     //se houver erro na abertura do arquivo
     if (fp == NULL) {
         printf("Falha no processamento do arquivo.");
@@ -450,10 +442,10 @@ void Funcionalidade3(char *nomeArquivo, int m) {
 
         Registro *r = readRegister(fp, RRN - 1);
 
-        if(r==NULL)
+        if (r == NULL)
             continue;
 
-        if(ComparaCamposNaoNulos(r,rBusca)==0)
+        if (ComparaCamposNaoNulos(r, rBusca) == 0)
             continue;
         //imprime o registro
         PrintR(r);
@@ -463,7 +455,7 @@ void Funcionalidade3(char *nomeArquivo, int m) {
         freeRegister(&r);
     }
     freeRegister(&rBusca);
-    if(imprimiu==0){
+    if (imprimiu == 0) {
         printf("Registro Inexistente.");
     }
 }
@@ -495,7 +487,7 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     //busca o registro de rrn desejado
     Registro *r = readRegister(fp, rrn);
 
-    if(r==NULL) { //se o registro foi removido;
+    if (r == NULL) { //se o registro foi removido;
         printf("Registro Inexistente.");
         return;
     }
@@ -511,10 +503,10 @@ void Funcionalidade4(char *nomeArquivo, int rrn) {
     fclose(fp);
 }
 
-void Funcionalidade5(char *nomeArquivo, int n){
+void Funcionalidade5(char *nomeArquivo, int n) {
     FILE *fp = fopen(nomeArquivo, "r+b");
 
-     //se houver erro na abertura do arquivo
+    //se houver erro na abertura do arquivo
     if (fp == NULL) {
         printf("Falha no processamento do arquivo.");
         return;
@@ -528,7 +520,7 @@ void Funcionalidade5(char *nomeArquivo, int n){
         fclose(fp);
         return;
     }
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         int m = 0;
         scanf("%d", &m);
         Registro *rBusca = MontarCampos(m);
@@ -537,20 +529,20 @@ void Funcionalidade5(char *nomeArquivo, int n){
 
             Registro *r = readRegister(fp, RRN - 1);
 
-            if(r==NULL)
+            if (r == NULL)
                 continue;
 
-            if(ComparaCamposNaoNulos(r,rBusca)==0)
+            if (ComparaCamposNaoNulos(r, rBusca) == 0)
                 continue;
             //remove registro
-            deleteRegister(fp, RRN-1, rh);
+            deleteRegister(fp, RRN - 1, rh);
 
             if (r->cidadeMae_size >= 0) free(r->cidadeMae);
             if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
             freeRegister(&r);
         }
         freeRegister(&rBusca);
-        RRN=0;
+        RRN = 0;
     }
 
     free(rh);
@@ -560,6 +552,20 @@ void Funcionalidade5(char *nomeArquivo, int n){
 
 void Funcionalidade7(char *nomeArquivo, int n) {
     FILE *fp = fopen(nomeArquivo, "r+b");
+
+    if (fp == NULL) {
+        printf("Falha no processamento do arquivo.");
+        return;
+    }
+
+    // le o registro de cabeçalho para verificar o arquivo está em status disponível
+    RegistroHeader *rh = readRegisterHeader(fp);
+
+    if (rh->status == '0') {
+        printf("Falha no processamento do arquivo.");
+        free(rh);
+        return;
+    }
 
     for (int i = 0; i < n; i++) {
         int rrn;
@@ -648,13 +654,14 @@ void Funcionalidade7(char *nomeArquivo, int n) {
         }
 
 //        printRegister(r);
-        updateRegister(fp, rrn, r);
+        updateRegister(fp, rrn, r, rh);
 
         if (r->cidadeMae_size >= 0) free(r->cidadeMae);
         if (r->cidadeBebe_size >= 0) free(r->cidadeBebe);
         freeRegister(&r);
     }
 
+    free(rh);
     fclose(fp);
 
     binarioNaTela(nomeArquivo);
