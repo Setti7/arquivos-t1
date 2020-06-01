@@ -184,7 +184,10 @@ Registro *readRegister(FILE *fp, int RRN) {
     /*
      * Retorna o registro no RRN especificado ou NULL, caso o registro tenha sido removido.
      * */
+
+    // Caso integridade seja diferente de 0, o registro é invalidado
     int integridade = 0;
+
     // Go to the next RRN position
     fseek(fp, 128 + (RRN * 128), SEEK_SET);
     Registro *r = initRegister();
@@ -221,22 +224,29 @@ Registro *readRegister(FILE *fp, int RRN) {
 
     fread(&r->idNascimento, sizeof(int), 1, fp);
     if (r->idNascimento != 0) integridade++;
+
     fread(&r->idadeMae, sizeof(int), 1, fp);
     if (r->idadeMae != 0) integridade++;
+
     fread(&r->dataNascimento, sizeof(char), 10, fp);
     if (strcmp(r->dataNascimento, "\0") != 0) integridade++;
+
     fread(&r->sexoBebe, sizeof(char), 1, fp);
     if (r->sexoBebe != '\0') integridade++;
+
     fread(&r->estadoMae, sizeof(char), 2, fp);
     if (strcmp(r->estadoMae, "\0") != 0) integridade++;
+
     fread(&r->estadoBebe, sizeof(char), 2, fp);
     if (strcmp(r->estadoBebe, "\0") != 0) integridade++;
+
     if (integridade == 0) {
         if (r->cidadeBebe_size > 0) free(r->cidadeBebe);
         if (r->cidadeMae_size > 0) free(r->cidadeMae);
         free(r);
         return NULL;
     }
+
     return r;
 }
 
