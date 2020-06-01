@@ -16,6 +16,83 @@ Registro *initRegister() {
     return calloc(1, sizeof(Registro));
 }
 
+void setRegisterField(Registro *r, char *fieldName, void *fieldValue) {
+    /*
+     * Atualiza um campo do registro com o valor dado.
+     *
+     * */
+
+    if (strcmp(fieldName, "cidadeMae") == 0) {
+        //se o campo for cidadeMae
+
+        if (strlen(fieldValue) == 0) {
+            r->cidadeMae_size = 0;
+        } else {
+            r->cidadeMae_size = strlen(fieldValue);
+
+            // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+            r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
+            strcpy(r->cidadeMae, fieldValue);
+        }
+    } else if (strcmp(fieldName, "cidadeBebe") == 0) {
+        // se o campo for cidadeBebe
+
+        if (strlen(fieldValue) == 0) {
+            r->cidadeBebe_size = 0;
+        } else {
+            r->cidadeBebe_size = strlen(fieldValue);
+
+            // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+            r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
+            strcpy(r->cidadeBebe, fieldValue);
+        }
+
+    } else if (strcmp(fieldName, "idNascimento") == 0) {
+        // se o campo for idNascimento, apenas atualize seu valor (não precisa tratar)
+        r->idNascimento = strtol(fieldValue, NULL, 10);
+    } else if (strcmp(fieldName, "idadeMae") == 0) {
+        // idade mae precisa tratar valores nulos com -1
+        if (strlen(fieldValue) == 0) {
+            r->idadeMae = -1;
+        } else {
+            r->idadeMae = strtol(fieldValue, NULL, 10);
+        }
+    } else if (strcmp(fieldName, "dataNascimento") == 0) {
+        // dataNascimento precisa tratar valores nulos
+
+        if (strlen(fieldValue) == 0) {
+            r->dataNascimento[0] = '\0';
+        } else {
+            strcpy(r->dataNascimento, fieldValue);
+        }
+    } else if (strcmp(fieldName, "sexoBebe") == 0) {
+        // sexoBebe precisa tratar valores nulos
+
+        if (strlen(fieldValue) == 0) {
+            r->sexoBebe = '0';
+        } else {
+            strcpy(&r->sexoBebe, fieldValue);
+        }
+    } else if (strcmp(fieldName, "estadoMae") == 0) {
+        // estadoMae precisa tratar valores nulos
+
+        if (strlen(fieldValue) == 0) {
+            r->estadoMae[0] = '\0';
+        } else {
+            strcpy(r->estadoMae, fieldValue);
+        }
+    } else if (strcmp(fieldName, "estadoBebe") == 0) {
+        // estadoBebe precisa tratar valores nulos
+
+        if (strlen(fieldValue) == 0) {
+            r->estadoBebe[0] = '\0';
+        } else {
+            strcpy(r->estadoBebe, fieldValue);
+        }
+    }
+
+}
+
 RegistroHeader *initRegisterHeader() {
     /*
      * Inicializa um registro de cabeçalho.
@@ -203,7 +280,7 @@ void deleteRegister(FILE *fp, int RRN, RegistroHeader *rh) {
 
 Registro *readRegister(FILE *fp, int RRN) {
     /*
-     * Retorna o registro no RRN especificado ou NULL, caso o registro tenha sido removido.
+     * Retorna o registro no RRN especificado ou NULL, caso o registro tenha sido removido (ou é inválido).
      * */
 
     // Caso integridade seja diferente de 0, o registro é invalidado

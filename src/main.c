@@ -578,6 +578,7 @@ void Funcionalidade6(char *nomeArquivo, int n) {
     Registro *r = initRegister();
     char campo[128];
 
+    // le todos os campos
     for (int i = 0; i < n; i++) {
         scan_quote_string(campo);
         if (campo[0] == '\0') {
@@ -692,75 +693,7 @@ void Funcionalidade7(char *nomeArquivo, int n) {
             scanf("%s", nomeCampo);
             scan_quote_string(valorCampo);
 
-            if (strcmp(nomeCampo, "cidadeMae") == 0) {
-                //se o campo for cidadeMae
-
-                if (valorCampo[0] == '\0') {
-                    r->cidadeMae_size = 0;
-                } else {
-                    r->cidadeMae_size = strlen(valorCampo);
-
-                    // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
-                    r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
-                    strcpy(r->cidadeMae, valorCampo);
-                }
-            } else if (strcmp(nomeCampo, "cidadeBebe") == 0) {
-                // se o campo for cidadeBebe
-
-                if (valorCampo[0] == '\0') {
-                    r->cidadeBebe_size = 0;
-                } else {
-                    r->cidadeBebe_size = strlen(valorCampo);
-
-                    // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
-                    r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
-                    strcpy(r->cidadeBebe, valorCampo);
-                }
-
-            } else if (strcmp(nomeCampo, "idNascimento") == 0) {
-                // se o campo for idNascimento, apenas atualize seu valor (não precisa tratar)
-                r->idNascimento = strtol(valorCampo, NULL, 10);
-            } else if (strcmp(nomeCampo, "idadeMae") == 0) {
-                // idade mae precisa tratar valores nulos com -1
-                if (valorCampo[0] == '\0') {
-                    r->idadeMae = -1;
-                } else {
-                    r->idadeMae = strtol(valorCampo, NULL, 10);
-                }
-            } else if (strcmp(nomeCampo, "dataNascimento") == 0) {
-                // dataNascimento precisa tratar valores nulos
-
-                if (valorCampo[0] == '\0') {
-                    r->dataNascimento[0] = '\0';
-                } else {
-                    strcpy(r->dataNascimento, valorCampo);
-                }
-            } else if (strcmp(nomeCampo, "sexoBebe") == 0) {
-                // sexoBebe precisa tratar valores nulos
-
-                if (valorCampo[0] == '\0') {
-                    r->sexoBebe = '0';
-                } else {
-                    r->sexoBebe = valorCampo[0];
-                }
-            } else if (strcmp(nomeCampo, "estadoMae") == 0) {
-                // estadoMae precisa tratar valores nulos
-
-                if (valorCampo[0] == '\0') {
-                    r->estadoMae[0] = '\0';
-                } else {
-                    strcpy(r->estadoMae, valorCampo);
-                }
-            } else if (strcmp(nomeCampo, "estadoBebe") == 0) {
-                // estadoBebe precisa tratar valores nulos
-
-                if (valorCampo[0] == '\0') {
-                    r->estadoBebe[0] = '\0';
-                } else {
-                    strcpy(r->estadoBebe, valorCampo);
-                }
-            }
-
+            setRegisterField(r, nomeCampo, valorCampo);
         }
 
 //        printRegister(r);

@@ -47,6 +47,8 @@ void printHeaderRegister(RegistroHeader *rh);
 
 Registro *initRegister();
 
+void setRegisterField(Registro *r, char *fieldName, void *fieldValue);
+
 RegistroHeader *initRegisterHeader();
 
 void freeRegister(Registro **r);
