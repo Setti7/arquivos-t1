@@ -20,6 +20,14 @@ void setRegisterField(Registro *r, char *fieldName, void *fieldValue) {
     /*
      * Atualiza um campo do registro com o valor dado.
      *
+     * cidadeMae: String
+     * cidadeBebe: String
+     * idNascimento: int
+     * idadeMae: int
+     * dataNascimento: String
+     * sexoBebe: char ou String
+     * estadoMae: String
+     * estadoBebe: String
      * */
 
     if (strcmp(fieldName, "cidadeMae") == 0) {
@@ -31,6 +39,7 @@ void setRegisterField(Registro *r, char *fieldName, void *fieldValue) {
             r->cidadeMae_size = strlen(fieldValue);
 
             // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+            // realloc chama malloc se  ainda não foi allocado, então não precisamos tratar.
             r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
             strcpy(r->cidadeMae, fieldValue);
         }
@@ -43,19 +52,20 @@ void setRegisterField(Registro *r, char *fieldName, void *fieldValue) {
             r->cidadeBebe_size = strlen(fieldValue);
 
             // realloc para ocupar o novo espaço da cidade mae (size + 1, pois tem que haver espaço para o \0)
+            // realloc chama malloc se  ainda não foi allocado, então não precisamos tratar.
             r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
             strcpy(r->cidadeBebe, fieldValue);
         }
 
     } else if (strcmp(fieldName, "idNascimento") == 0) {
         // se o campo for idNascimento, apenas atualize seu valor (não precisa tratar)
-        r->idNascimento = strtol(fieldValue, NULL, 10);
+        r->idNascimento = *(int *) fieldValue;
     } else if (strcmp(fieldName, "idadeMae") == 0) {
         // idade mae precisa tratar valores nulos com -1
         if (strlen(fieldValue) == 0) {
             r->idadeMae = -1;
         } else {
-            r->idadeMae = strtol(fieldValue, NULL, 10);
+            r->idadeMae = *(int *) fieldValue;
         }
     } else if (strcmp(fieldName, "dataNascimento") == 0) {
         // dataNascimento precisa tratar valores nulos
@@ -89,8 +99,9 @@ void setRegisterField(Registro *r, char *fieldName, void *fieldValue) {
         } else {
             strcpy(r->estadoBebe, fieldValue);
         }
+    } else {
+        fprintf(stderr, "Nome do campo inválido: %s", fieldName);
     }
-
 }
 
 RegistroHeader *initRegisterHeader() {

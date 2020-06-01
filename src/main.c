@@ -581,65 +581,34 @@ void Funcionalidade6(char *nomeArquivo, int n) {
     // le todos os campos
     for (int i = 0; i < n; i++) {
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->cidadeMae_size = 0;
-        } else {
-            r->cidadeMae_size = strlen(campo);
-
-            // realloc para ocupar o novo espaço da cidade (size + 1, pois tem que haver espaço para o \0)
-            r->cidadeMae = realloc(r->cidadeMae, sizeof(char) * r->cidadeMae_size + 1);
-            strcpy(r->cidadeMae, campo);
-        }
+        setRegisterField(r, "cidadeMae", campo);
 
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->cidadeBebe_size = 0;
-        } else {
-            r->cidadeBebe_size = strlen(campo);
-
-            // realloc para ocupar o novo espaço da cidade (size + 1, pois tem que haver espaço para o \0)
-            r->cidadeBebe = realloc(r->cidadeBebe, sizeof(char) * r->cidadeBebe_size + 1);
-            strcpy(r->cidadeBebe, campo);
-        }
+        setRegisterField(r, "cidadeBebe", campo);
 
         int idNascimento;
         scanf("%d", &idNascimento);
-        r->idNascimento = idNascimento;
+        setRegisterField(r, "idNascimento", &idNascimento);
 
         scan_quote_string(campo);
         if (campo[0] == '\0') {
             r->idadeMae = -1;
         } else {
-            r->idadeMae = strtol(campo, NULL, 10);
+            int idademae = strtol(campo, NULL, 10);
+            setRegisterField(r, "idadeMae", &idademae);
         }
 
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->dataNascimento[0] = '\0';
-        } else {
-            strcpy(r->dataNascimento, campo);
-        }
+        setRegisterField(r, "dataNascimento", &campo);
 
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->sexoBebe = '0';
-        } else {
-            r->sexoBebe = campo[0];
-        }
+        setRegisterField(r, "sexoBebe", &campo);
 
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->estadoMae[0] = '\0';
-        } else {
-            strcpy(r->estadoMae, campo);
-        }
+        setRegisterField(r, "estadoMae", &campo);
 
         scan_quote_string(campo);
-        if (campo[0] == '\0') {
-            r->estadoBebe[0] = '\0';
-        } else {
-            strcpy(r->estadoBebe, campo);
-        }
+        setRegisterField(r, "estadoBebe", &campo);
 
         insertRegister(fp, r, rh);
 //        printHeaderRegister(rh);
