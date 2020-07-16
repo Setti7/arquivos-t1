@@ -13,14 +13,20 @@ struct arvoreBPagina {
     int filhos[MAX_KEYS+1];     //RRN das paginas filhas
 } Pagina;
 
+struct chave {
+    int valor;
+    int RRN;
+} Chave;
+
 struct arvoreBCabecalho {
     char status;        //informa a consistencia do arquivo de indices
     int raiz;           //informa o RRN do no raiz
     int profundidade;   //numero de niveis da arvore
     int proxRRN;        //informa qual a proxima pagina livre para inserir elementos na arvore
     int numeroChaves;   //informa quantas chaves estao armazenadas no arquivo
-    char lixo[55];      //lixo para preencher o valor de 72 bytes do cabecalho
+    //char lixo[55];      //lixo para preencher o valor de 72 bytes do cabecalho
 } Cabecalho;
 
+void escreveCabecalhoIndice (FILE *fp, Cabecalho *c);
 
 #endif // ARVOREB_H_INCLUDED
