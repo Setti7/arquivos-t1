@@ -29,4 +29,6 @@ struct arvoreBCabecalho {
 
 void escreveCabecalhoIndice (FILE *fp, Cabecalho *c);
 
+int busca(FILE *fp, int RRN, int chave, int *foundRRN, int *foundPOS);
+
 #endif // ARVOREB_H_INCLUDED
