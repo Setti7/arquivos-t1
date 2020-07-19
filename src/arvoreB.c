@@ -36,14 +36,16 @@ void escreveCabecalhoIndice (FILE *fp, Cabecalho *c) {
     fwrite(&t, sizeof(char), 55, fp);
 }
 
-int busca(FILE *fp, int RRN, int chave, int *foundRRN, int *foundPOS) {
+int buscaInterna(FILE *fp, int RRN, int chave, int *foundRRN, int *foundPOS) {
     if(RRN == -1) {
         //nao encontrou
         return -1;
     }
 
     Pagina p;
-    //READ PAGE
+
+    // TODO READ PAGE
+
     for(int i = 0; i<p.numeroDeChaves; i++){
         if (chave < p.chaves[i]) {
             return busca (fp, p.filhos[i], chave, foundRRN, foundPOS);
@@ -60,6 +62,19 @@ int busca(FILE *fp, int RRN, int chave, int *foundRRN, int *foundPOS) {
         &foundPOS = i;
         return 0; //nao achou a chave mas achou onde inserir ela.
     }
-    return busca (fp, p.filhos[i], chave, foundRRN, foundPOS);
+    return buscaInterna (fp, p.filhos[i], chave, foundRRN, foundPOS);
+}
 
+int buscaChave (FILE *fp, int chave) {
+    int foundRRN, foundPOS;
+
+    //TODO read header
+    Cabecalho c;
+    if(buscaInterna(fp, c.raiz, chave, &foundRRN, &foundPOS)>0){
+        //TODO read foundRRN
+        Pagina p;
+        return p.RRNChaves[foundPOS];
+    }
+    else
+        return -1;
 }

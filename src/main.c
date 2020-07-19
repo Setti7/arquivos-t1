@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "binarioNaTela.h"
 #include <string.h>
+#include "arvoreB.h"
 
 void firstOperation(char *arquivoEntrada, char *arquivoSaida);
 
